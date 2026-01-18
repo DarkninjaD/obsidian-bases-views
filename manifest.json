@@ -1,0 +1,11 @@
+{
+  "id": "bases-custom-views",
+  "name": "Bases Custom Views",
+  "version": "0.1.0",
+  "minAppVersion": "1.10.0",
+  "description": "Adds Board, Gantt, and Calendar views to Obsidian Bases",
+  "author": "",
+  "authorUrl": "",
+  "fundingUrl": "",
+  "isDesktopOnly": false
+}

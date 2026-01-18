@@ -1,0 +1,172 @@
+/* Calendar View Styles */
+
+.bv-calendar-view {
+  @apply flex flex-col h-full;
+}
+
+/* Header */
+.bv-calendar-header {
+  @apply flex items-center justify-between mb-4 pb-4 border-b;
+  border-color: var(--interactive-accent);
+}
+
+.bv-calendar-property-selector {
+  @apply flex-shrink-0;
+  min-width: 200px;
+}
+
+.bv-calendar-controls {
+  @apply flex items-center gap-3 flex-1 justify-center;
+}
+
+.bv-calendar-nav-button {
+  @apply px-3 py-1 rounded cursor-pointer border;
+  background: var(--background-secondary);
+  border-color: var(--interactive-accent);
+  color: var(--text-normal);
+  transition: background 0.2s ease;
+}
+
+.bv-calendar-nav-button:hover {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.bv-calendar-today-button {
+  @apply px-4 py-1 rounded cursor-pointer;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  font-weight: 500;
+}
+
+.bv-calendar-title {
+  @apply text-xl font-semibold m-0 px-4;
+  color: var(--text-normal);
+  min-width: 200px;
+  text-align: center;
+}
+
+/* View Switcher */
+.bv-calendar-view-switcher {
+  @apply flex gap-1 rounded border;
+  border-color: var(--interactive-accent);
+  overflow: hidden;
+}
+
+.bv-calendar-view-button {
+  @apply px-3 py-1 cursor-pointer;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  border: none;
+  transition: background 0.2s ease;
+}
+
+.bv-calendar-view-button:hover {
+  background: var(--background-modifier-hover);
+}
+
+.bv-calendar-view-button-active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+/* Month View */
+.bv-calendar-month-view {
+  @apply flex-1 flex flex-col;
+}
+
+/* Week View */
+.bv-calendar-week-view {
+  @apply flex-1 flex flex-col;
+}
+
+/* Weekday Header */
+.bv-calendar-weekday-header {
+  @apply flex border-b;
+  border-color: var(--interactive-accent);
+  background: var(--background-secondary);
+}
+
+.bv-calendar-weekday {
+  @apply flex-1 text-center p-2 font-semibold text-sm;
+  color: var(--text-normal);
+}
+
+/* Calendar Grid */
+.bv-calendar-grid {
+  @apply flex-1 flex flex-col;
+}
+
+.bv-calendar-week-row {
+  @apply flex flex-1 border-b;
+  border-color: var(--background-modifier-border);
+}
+
+.bv-calendar-week-grid {
+  @apply flex flex-1;
+}
+
+/* Day Cell */
+.bv-calendar-day-cell {
+  @apply flex-1 flex flex-col p-2 border-r;
+  min-height: 100px;
+  border-color: var(--background-modifier-border);
+  background: var(--background-primary);
+  transition: background 0.2s ease;
+}
+
+.bv-calendar-day-cell:last-child {
+  border-right: none;
+}
+
+.bv-calendar-day-other-month {
+  opacity: 0.4;
+}
+
+.bv-calendar-day-today {
+  background: var(--background-modifier-hover);
+}
+
+.bv-calendar-day-drag-over {
+  background: var(--interactive-accent);
+  opacity: 0.2;
+}
+
+.bv-calendar-day-number {
+  @apply text-sm font-medium mb-2;
+  color: var(--text-normal);
+}
+
+.bv-calendar-day-today .bv-calendar-day-number {
+  @apply rounded px-2 py-1;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  display: inline-block;
+}
+
+.bv-calendar-day-events {
+  @apply flex flex-col gap-1 flex-1;
+}
+
+.bv-calendar-day-drop-hint {
+  @apply text-xs text-center p-2 border-2 border-dashed rounded;
+  border-color: var(--interactive-accent);
+  color: var(--text-muted);
+}
+
+/* Event */
+.bv-calendar-event {
+  @apply px-2 py-1 rounded cursor-pointer text-xs truncate;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bv-calendar-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.bv-calendar-event-title {
+  @apply truncate;
+}

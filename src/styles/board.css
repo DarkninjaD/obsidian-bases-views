@@ -1,0 +1,162 @@
+/* Board View Styles */
+
+.bv-board-view {
+  @apply flex flex-col h-full;
+}
+
+.bv-board-header {
+  @apply mb-4 pb-4 border-b flex gap-4 flex-wrap;
+  border-color: var(--interactive-accent);
+}
+
+.bv-board-columns {
+  @apply flex gap-4 overflow-x-auto flex-1;
+}
+
+/* Column Styles */
+.bv-column {
+  @apply flex flex-col rounded-lg p-4;
+  min-width: 20rem;
+  max-width: 20rem;
+  background: var(--background-secondary);
+}
+
+.bv-column-header {
+  @apply flex items-center justify-between mb-3 pb-2 border-b;
+  border-color: var(--interactive-accent);
+}
+
+.bv-column-title {
+  @apply text-lg font-semibold m-0;
+  color: var(--text-normal);
+}
+
+.bv-column-count {
+  @apply text-sm px-2 py-1 rounded;
+  background: var(--interactive-accent);
+  color: var(--background-primary);
+}
+
+.bv-column-content {
+  @apply flex flex-col gap-3 flex-1 overflow-y-auto;
+  min-height: 5rem;
+  transition: background-color 0.2s ease;
+}
+
+.bv-column-content-hover {
+  background: var(--interactive-accent);
+  opacity: 0.1;
+}
+
+.bv-column-empty {
+  @apply flex items-center justify-center h-full border-2 border-dashed rounded;
+  min-height: 10rem;
+  border-color: var(--interactive-accent);
+  opacity: 0.5;
+}
+
+/* Card Styles */
+.bv-card {
+  @apply rounded p-3 cursor-pointer border;
+  background: var(--background-primary);
+  border-color: var(--interactive-accent);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bv-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.bv-card-title {
+  @apply text-base font-medium m-0 mb-2;
+  color: var(--text-normal);
+}
+
+.bv-card-properties {
+  @apply flex flex-col gap-1;
+}
+
+.bv-card-property {
+  @apply flex gap-2 text-sm;
+}
+
+.bv-card-property-key {
+  @apply font-medium;
+  color: var(--text-muted);
+}
+
+.bv-card-property-value {
+  color: var(--text-normal);
+}
+
+/* Grid Layout Styles (Notion-style) */
+.bv-board-grid {
+  @apply flex flex-col flex-1 overflow-auto;
+}
+
+.bv-grid-header-row {
+  @apply flex border-b sticky top-0 z-10;
+  background: var(--background-primary);
+  border-color: var(--background-modifier-border);
+}
+
+.bv-grid-corner-cell {
+  min-width: 12rem;
+  max-width: 12rem;
+  background: var(--background-secondary);
+}
+
+.bv-grid-header-cell {
+  @apply flex items-center justify-center p-4 border-r;
+  min-width: 20rem;
+  max-width: 20rem;
+  background: var(--background-secondary);
+  border-color: var(--background-modifier-border);
+}
+
+.bv-grid-header-title {
+  @apply text-base font-semibold m-0;
+  color: var(--text-normal);
+}
+
+.bv-grid-data-row {
+  @apply flex border-b;
+  border-color: var(--background-modifier-border);
+  min-height: 8rem;
+}
+
+.bv-grid-row-header {
+  @apply flex items-center p-4 border-r sticky left-0 z-5;
+  min-width: 12rem;
+  max-width: 12rem;
+  background: var(--background-secondary);
+  border-color: var(--background-modifier-border);
+}
+
+.bv-grid-row-title {
+  @apply text-sm font-medium m-0;
+  color: var(--text-muted);
+}
+
+.bv-grid-cell {
+  @apply flex flex-col gap-2 p-3 border-r;
+  min-width: 20rem;
+  max-width: 20rem;
+  min-height: 8rem;
+  border-color: var(--background-modifier-border);
+  transition: background-color 0.2s ease;
+}
+
+.bv-grid-cell-hover {
+  background: var(--interactive-accent);
+  opacity: 0.1;
+}
+
+.bv-grid-cell-empty {
+  @apply flex items-center justify-center h-full border border-dashed rounded;
+  min-height: 5rem;
+  border-color: var(--background-modifier-border);
+  opacity: 0.5;
+}

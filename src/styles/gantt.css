@@ -1,0 +1,166 @@
+/* Gantt View Styles */
+
+.bv-gantt-view {
+  @apply flex flex-col h-full;
+}
+
+.bv-gantt-header {
+  @apply mb-4 pb-4 border-b;
+  border-color: var(--interactive-accent);
+}
+
+.bv-gantt-property-selectors {
+  @apply flex gap-4;
+}
+
+.bv-gantt-container {
+  @apply flex flex-1 overflow-hidden;
+}
+
+/* Task List (Left Sidebar) */
+.bv-gantt-task-list {
+  @apply flex flex-col border-r;
+  width: 250px;
+  flex-shrink: 0;
+  border-color: var(--interactive-accent);
+}
+
+.bv-gantt-task-list-header {
+  @apply p-3 border-b font-semibold;
+  height: 60px;
+  border-color: var(--interactive-accent);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+}
+
+.bv-gantt-task-list-title {
+  @apply text-sm;
+}
+
+.bv-gantt-task-list-content {
+  @apply relative flex-1 overflow-y-auto;
+}
+
+.bv-gantt-task-list-item {
+  @apply absolute p-2 border-b;
+  width: 100%;
+  height: 40px;
+  border-color: var(--background-modifier-border);
+}
+
+.bv-gantt-task-list-item-title {
+  @apply text-sm font-medium truncate;
+  color: var(--text-normal);
+}
+
+.bv-gantt-task-list-item-dates {
+  @apply text-xs;
+  color: var(--text-muted);
+}
+
+/* Chart Area */
+.bv-gantt-chart-wrapper {
+  @apply flex-1 flex flex-col overflow-x-auto;
+}
+
+/* Timeline Header */
+.bv-gantt-timeline {
+  @apply flex border-b;
+  height: 60px;
+  border-color: var(--interactive-accent);
+  background: var(--background-secondary);
+  min-width: 1000px;
+}
+
+.bv-gantt-timeline-day {
+  @apply flex flex-col items-center justify-center border-r text-xs relative;
+  border-color: var(--background-modifier-border);
+}
+
+.bv-gantt-timeline-month-start {
+  @apply border-l-2;
+  border-left-color: var(--interactive-accent);
+}
+
+.bv-gantt-timeline-month {
+  @apply absolute top-1 left-1 text-xs font-semibold;
+  color: var(--text-normal);
+}
+
+.bv-gantt-timeline-date {
+  @apply mt-auto mb-1;
+  color: var(--text-muted);
+}
+
+/* Chart with Grid and Tasks */
+.bv-gantt-chart {
+  @apply relative overflow-y-auto;
+  min-width: 1000px;
+  background: var(--background-primary);
+}
+
+/* Grid */
+.bv-gantt-grid {
+  @apply absolute inset-0 pointer-events-none;
+}
+
+.bv-gantt-grid-column {
+  @apply absolute h-full border-r;
+  border-color: var(--background-modifier-border);
+  opacity: 0.3;
+}
+
+.bv-gantt-grid-row {
+  @apply absolute w-full border-b;
+  border-color: var(--background-modifier-border);
+  opacity: 0.3;
+}
+
+/* Task Bar */
+.bv-gantt-task-bar {
+  @apply absolute flex items-center rounded cursor-pointer;
+  height: 30px;
+  margin-top: 5px;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-width: 40px;
+}
+
+.bv-gantt-task-bar:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+  z-index: 10;
+}
+
+.bv-gantt-task-bar-resizing {
+  z-index: 20;
+  opacity: 0.8;
+}
+
+.bv-gantt-task-content {
+  @apply flex-1 px-2 overflow-hidden;
+}
+
+.bv-gantt-task-title {
+  @apply text-sm font-medium truncate;
+}
+
+/* Resize Handles */
+.bv-gantt-resize-handle {
+  @apply absolute top-0 bottom-0 cursor-ew-resize;
+  width: 8px;
+  z-index: 2;
+}
+
+.bv-gantt-resize-handle:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.bv-gantt-resize-left {
+  @apply left-0 rounded-l;
+}
+
+.bv-gantt-resize-right {
+  @apply right-0 rounded-r;
+}
