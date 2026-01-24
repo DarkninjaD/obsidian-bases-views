@@ -40,7 +40,7 @@ export const GridCell: React.FC<GridCellProps> = ({
   return (
     <div
       ref={setNodeRef}
-      className={`bv-grid-cell bv-grid-cell-notion ${isOver ? 'bv-grid-cell-hover' : ''}`}
+      className={`bv-grid-cell bv-grid-cell-notion ${isOver ? 'bv-grid-cell-drag-over' : ''}`}
     >
       <SortableContext
         items={entries.map((e) => e.id)}

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { App, BasesQueryResult, HoverParent } from 'obsidian';
-import { DndContext, DragEndEvent, DragOverlay, PointerSensor, useSensor, useSensors, pointerWithin, CollisionDetection } from '@dnd-kit/core';
+import { DndContext, DragEndEvent, DragStartEvent, DragOverlay, PointerSensor, useSensor, useSensors, pointerWithin, CollisionDetection } from '@dnd-kit/core';
 import { useBoardData } from './hooks/useBoardData';
 import { usePropertyUpdate } from '../../hooks/usePropertyUpdate';
 import { Column } from './components/Column';
@@ -10,6 +10,7 @@ import { RowHeader } from './components/RowHeader';
 import { EmptyState } from '../../components/shared/EmptyState';
 import { TextInputModal } from '../../components/shared/TextInputModal';
 import { BoardViewOptions } from '../../types/view-config';
+import { Card } from './components/Card';
 
 interface BoardViewProps {
   data: BasesQueryResult;
@@ -38,6 +39,15 @@ export const BoardView: React.FC<BoardViewProps> = ({
 
   // State for collapsed rows
   const [collapsedRows, setCollapsedRows] = React.useState<Set<string>>(new Set());
+
+  // State for active dragged item
+  const [activeId, setActiveId] = React.useState<string | null>(null);
+
+  // Find the active entry for drag overlay
+  const activeEntry = React.useMemo(() => {
+    if (!activeId) return null;
+    return entries.find((e) => e.id === activeId) || null;
+  }, [activeId, entries]);
 
   // Toggle row collapse state
   const toggleRowCollapse = React.useCallback((rowKey: string) => {
@@ -79,9 +89,17 @@ export const BoardView: React.FC<BoardViewProps> = ({
   }, []);
 
   /**
+   * Handle drag start - track active dragged item
+   */
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  /**
    * Handle drag end - update property when card is dropped
    */
   const handleDragEnd = (event: DragEndEvent) => {
+    setActiveId(null);
     const { active, over } = event;
 
     if (!over) return;
@@ -196,7 +214,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
     return (
       <div className="bv-board-view bv-board-notion">
         {/* Matrix layout with drag-and-drop */}
-        <DndContext sensors={sensors} onDragEnd={handleDragEnd} collisionDetection={cellOnlyCollision}>
+        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd} collisionDetection={cellOnlyCollision}>
           <div className="bv-board-matrix">
             {/* Header row with column titles */}
             <div className="bv-matrix-header">
@@ -275,8 +293,15 @@ export const BoardView: React.FC<BoardViewProps> = ({
             </div>
           </div>
 
-          <DragOverlay>
-            {/* Could render a card preview here during drag */}
+          <DragOverlay dropAnimation={null}>
+            {activeEntry && (
+              <Card
+                entry={activeEntry}
+                app={app}
+                hoverParent={hoverParent}
+                excludeProperties={excludeProperties}
+              />
+            )}
           </DragOverlay>
         </DndContext>
       </div>
@@ -287,7 +312,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
   return (
     <div className="bv-board-view bv-board-notion">
       {/* Board columns with drag-and-drop */}
-      <DndContext sensors={sensors} onDragEnd={handleDragEnd} collisionDetection={cellOnlyCollision}>
+      <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd} collisionDetection={cellOnlyCollision}>
         <div className="bv-board-columns">
           {groups.map(([groupTitle]) => {
             const subGroups = groupsWithSubGroups.get(groupTitle);
@@ -315,8 +340,15 @@ export const BoardView: React.FC<BoardViewProps> = ({
           </div>
         </div>
 
-        <DragOverlay>
-          {/* Could render a card preview here during drag */}
+        <DragOverlay dropAnimation={null}>
+          {activeEntry && (
+            <Card
+              entry={activeEntry}
+              app={app}
+              hoverParent={hoverParent}
+              excludeProperties={excludeProperties}
+            />
+          )}
         </DragOverlay>
       </DndContext>
     </div>

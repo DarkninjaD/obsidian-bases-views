@@ -45,10 +45,6 @@
   padding: 0.25rem;
 }
 
-.bv-column-content-hover {
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 0.25rem;
-}
 
 /* Card Styles - Notion-style */
 .bv-card {
@@ -214,9 +210,6 @@
   border-right: none;
 }
 
-.bv-grid-cell-hover {
-  background: rgba(255, 255, 255, 0.02);
-}
 
 /* New Group Button - Notion-style */
 .bv-column-new-group,
@@ -282,6 +275,24 @@
 /* Dragging state */
 .bv-card-dragging {
   opacity: 0.5;
+}
+
+/* Drag overlay - semi-transparent card preview */
+[data-dnd-kit-drag-overlay] .bv-card {
+  opacity: 0.85;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.15);
+  transform: rotate(3deg);
+  cursor: grabbing;
+}
+
+/* Drop zone highlighting */
+.bv-column-drag-over {
+  background-color: rgba(139, 92, 246, 0.2) !important;
+  border-radius: 6px;
+}
+
+.bv-grid-cell-drag-over {
+  background-color: rgba(139, 92, 246, 0.2) !important;
 }
 
 /* Property Selector styling */

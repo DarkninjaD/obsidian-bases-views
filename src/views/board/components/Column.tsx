@@ -50,7 +50,7 @@ export const Column: React.FC<ColumnProps> = ({
       {/* Column content with sortable cards */}
       <div
         ref={setNodeRef}
-        className={`bv-column-content ${isOver ? 'bv-column-content-hover' : ''}`}
+        className={`bv-column-content ${isOver ? 'bv-column-drag-over' : ''}`}
       >
         <SortableContext
           items={entries.map((e) => e.id)}
