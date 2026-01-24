@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { App, BasesQueryResult, HoverParent } from 'obsidian';
-import { DndContext, DragEndEvent, DragOverlay, PointerSensor, useSensor, useSensors, rectIntersection } from '@dnd-kit/core';
+import { DndContext, DragEndEvent, DragOverlay, PointerSensor, useSensor, useSensors, pointerWithin, CollisionDetection } from '@dnd-kit/core';
 import { useBoardData } from './hooks/useBoardData';
 import { usePropertyUpdate } from '../../hooks/usePropertyUpdate';
 import { Column } from './components/Column';
@@ -80,6 +80,21 @@ export const BoardView: React.FC<BoardViewProps> = ({
       },
     })
   );
+
+  // Custom collision detection that only considers cells/columns (not cards)
+  const cellOnlyCollision: CollisionDetection = React.useCallback((args) => {
+    const { droppableContainers, ...rest } = args;
+
+    // Filter to only include cell/column droppables (exclude card IDs which are file paths)
+    const cellContainers = droppableContainers.filter((container) => {
+      const id = String(container.id);
+      // Card IDs are file paths (contain '/' or end with '.md')
+      const isCardId = id.includes('/') || id.endsWith('.md');
+      return !isCardId;
+    });
+
+    return pointerWithin({ ...rest, droppableContainers: cellContainers });
+  }, []);
 
   /**
    * Handle drag end - update property when card is dropped
@@ -219,7 +234,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
         </div>
 
         {/* Matrix layout with drag-and-drop */}
-        <DndContext sensors={sensors} onDragEnd={handleDragEnd} collisionDetection={rectIntersection}>
+        <DndContext sensors={sensors} onDragEnd={handleDragEnd} collisionDetection={cellOnlyCollision}>
           <div className="bv-board-matrix">
             {/* Header row with column titles */}
             <div className="bv-matrix-header">
@@ -330,7 +345,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
       </div>
 
       {/* Board columns with drag-and-drop */}
-      <DndContext sensors={sensors} onDragEnd={handleDragEnd} collisionDetection={rectIntersection}>
+      <DndContext sensors={sensors} onDragEnd={handleDragEnd} collisionDetection={cellOnlyCollision}>
         <div className="bv-board-columns">
           {groups.map(([groupTitle]) => {
             const subGroups = groupsWithSubGroups.get(groupTitle);
