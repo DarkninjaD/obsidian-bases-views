@@ -8,6 +8,8 @@ import { NewPageButton } from './NewPageButton';
 
 interface GridCellProps {
   dropId: string;
+  /** Column title to display in header */
+  title?: string;
   entries: BasesEntry[];
   app: App;
   hoverParent: HoverParent;
@@ -23,6 +25,7 @@ interface GridCellProps {
  */
 export const GridCell: React.FC<GridCellProps> = ({
   dropId,
+  title,
   entries,
   app,
   hoverParent,
@@ -40,29 +43,31 @@ export const GridCell: React.FC<GridCellProps> = ({
   return (
     <div
       ref={setNodeRef}
-      className={`bv-grid-cell bv-grid-cell-notion ${isOver ? 'bv-grid-cell-drag-over' : ''}`}
+      className={`bv-grid-cell ${isOver ? 'bv-grid-cell-drag-over' : ''}`}
     >
-      <SortableContext
-        items={entries.map((e) => e.id)}
-        strategy={verticalListSortingStrategy}
-      >
-        {entries.map((entry) => (
-          <Card
-            key={entry.id}
-            entry={entry}
-            app={app}
-            hoverParent={hoverParent}
-            excludeProperties={excludeProperties}
-          />
-        ))}
-      </SortableContext>
+      <div className="bv-column-content">
+        <SortableContext
+          items={entries.map((e) => e.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          {entries.map((entry) => (
+            <Card
+              key={entry.id}
+              entry={entry}
+              app={app}
+              hoverParent={hoverParent}
+              excludeProperties={excludeProperties}
+            />
+          ))}
+        </SortableContext>
 
-      {/* New page button - always visible, more prominent when empty */}
-      <NewPageButton
-        onClick={handleNewPage}
-        compact={entries.length > 0}
-        label="+ New page"
-      />
+        {/* New page button - always visible, more prominent when empty */}
+        <NewPageButton
+          onClick={handleNewPage}
+          compact={entries.length > 0}
+          label="+ New page"
+        />
+      </div>
     </div>
   );
 };

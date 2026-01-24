@@ -5,7 +5,6 @@ import { useBoardData } from './hooks/useBoardData';
 import { usePropertyUpdate } from '../../hooks/usePropertyUpdate';
 import { Column } from './components/Column';
 import { GridCell } from './components/GridCell';
-import { StatusBadge } from './components/StatusBadge';
 import { RowHeader } from './components/RowHeader';
 import { EmptyState } from '../../components/shared/EmptyState';
 import { TextInputModal } from '../../components/shared/TextInputModal';
@@ -213,84 +212,81 @@ export const BoardView: React.FC<BoardViewProps> = ({
 
     return (
       <div className="bv-board-view bv-board-notion">
-        {/* Matrix layout with drag-and-drop */}
+        {/* Section-based layout with drag-and-drop */}
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd} collisionDetection={cellOnlyCollision}>
-          <div className="bv-board-matrix">
-            {/* Header row with column titles */}
-            <div className="bv-matrix-header">
-              <div className="bv-matrix-corner"></div>
-              {groups.map(([groupTitle]) => {
-                // Count entries in this column
+          {/* Column headers - shared across all sections */}
+          <div className="bv-board-header">
+            {groups.map(([groupTitle]) => {
+              // Count total entries in this column across all sub-groups
+              const subGroups = groupsWithSubGroups.get(groupTitle);
+              const columnTotal = subGroups
+                ? Array.from(subGroups.values()).reduce((sum, entries) => sum + entries.length, 0)
+                : 0;
+
+              return (
+                <div key={groupTitle} className="bv-board-header-column">
+                  <span className="bv-column-title">{groupTitle}</span>
+                  <span className="bv-column-count">{columnTotal}</span>
+                </div>
+              );
+            })}
+            <div className="bv-board-header-new-group">
+              <button className="bv-new-group-btn" onClick={handleNewGroup}>
+                + New group
+              </button>
+            </div>
+          </div>
+
+          <div className="bv-board-sections">
+            {/* Sections - one per sub-group */}
+            {subGroupKeys.map((subGroupKey) => {
+              const isCollapsed = collapsedRows.has(subGroupKey);
+
+              // Count entries in this section
+              const sectionEntryCount = groups.reduce((sum, [groupTitle]) => {
                 const subGroups = groupsWithSubGroups.get(groupTitle);
-                const count = Array.from(subGroups?.values() || []).reduce(
-                  (sum, entries) => sum + entries.length,
-                  0
-                );
+                return sum + (subGroups?.get(subGroupKey)?.length || 0);
+              }, 0);
 
-                return (
-                  <div key={groupTitle} className="bv-matrix-column-header">
-                    <StatusBadge value={groupTitle} count={count} size="md" />
-                  </div>
-                );
-              })}
-              {/* New group button */}
-              <div className="bv-matrix-new-group">
-                <button className="bv-new-group-btn" onClick={handleNewGroup}>
-                  + New group
-                </button>
-              </div>
-            </div>
+              return (
+                <div
+                  key={subGroupKey}
+                  className={`bv-board-section ${isCollapsed ? 'bv-board-section-collapsed' : ''}`}
+                >
+                  {/* Section header - spans full width */}
+                  <RowHeader
+                    title={subGroupKey}
+                    count={sectionEntryCount}
+                    isCollapsed={isCollapsed}
+                    onToggle={() => toggleRowCollapse(subGroupKey)}
+                  />
 
-            {/* Data rows - one row per sub-group */}
-            <div className="bv-matrix-body">
-              {subGroupKeys.map((subGroupKey) => {
-                const isCollapsed = collapsedRows.has(subGroupKey);
+                  {/* Section content - columns side by side */}
+                  {!isCollapsed && (
+                    <div className="bv-board-section-content">
+                      {groups.map(([groupTitle]) => {
+                        const subGroups = groupsWithSubGroups.get(groupTitle);
+                        const cellEntries = subGroups?.get(subGroupKey) || [];
+                        const dropId = `${groupTitle}:${subGroupKey}`;
 
-                // Count entries in this row
-                const rowEntryCount = groups.reduce((sum, [groupTitle]) => {
-                  const subGroups = groupsWithSubGroups.get(groupTitle);
-                  return sum + (subGroups?.get(subGroupKey)?.length || 0);
-                }, 0);
-
-                return (
-                  <div
-                    key={subGroupKey}
-                    className={`bv-matrix-row ${isCollapsed ? 'bv-matrix-row-collapsed' : ''}`}
-                  >
-                    {/* Row header */}
-                    <RowHeader
-                      title={subGroupKey}
-                      count={rowEntryCount}
-                      isCollapsed={isCollapsed}
-                      onToggle={() => toggleRowCollapse(subGroupKey)}
-                    />
-
-                    {/* Row cells - only render if not collapsed */}
-                    {!isCollapsed && (
-                      <div className="bv-matrix-row-cells">
-                        {groups.map(([groupTitle]) => {
-                          const subGroups = groupsWithSubGroups.get(groupTitle);
-                          const cellEntries = subGroups?.get(subGroupKey) || [];
-                          const dropId = `${groupTitle}:${subGroupKey}`;
-
-                          return (
-                            <GridCell
-                              key={dropId}
-                              dropId={dropId}
-                              entries={cellEntries}
-                              app={app}
-                              hoverParent={hoverParent}
-                              onNewPage={handleNewPage}
-                              excludeProperties={excludeProperties}
-                            />
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                        return (
+                          <GridCell
+                            key={dropId}
+                            dropId={dropId}
+                            title={groupTitle}
+                            entries={cellEntries}
+                            app={app}
+                            hoverParent={hoverParent}
+                            onNewPage={handleNewPage}
+                            excludeProperties={excludeProperties}
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
           <DragOverlay dropAnimation={null}>
