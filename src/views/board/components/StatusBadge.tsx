@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { getColorForValue } from '../utils/colorUtils';
 
 interface StatusBadgeProps {
   value: string;
@@ -8,26 +7,17 @@ interface StatusBadgeProps {
 }
 
 /**
- * Colored badge component for status/category values.
- * Generates consistent colors based on value hash.
+ * Badge component for column/row headers.
+ * Shows label text and optional count.
  */
 export const StatusBadge: React.FC<StatusBadgeProps> = ({
   value,
   count,
   size = 'md',
 }) => {
-  const colors = getColorForValue(value);
-
   return (
-    <span
-      className={`bv-status-badge bv-status-badge-${size}`}
-      style={{
-        backgroundColor: colors.background,
-        color: colors.text,
-        borderColor: colors.border,
-      }}
-    >
-      {value}
+    <span className={`bv-status-badge bv-status-badge-${size}`}>
+      <span className="bv-badge-label">{value}</span>
       {count !== undefined && <span className="bv-badge-count">{count}</span>}
     </span>
   );
