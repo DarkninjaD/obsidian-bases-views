@@ -119,9 +119,7 @@ export const GanttView: React.FC<GanttViewProps> = ({
         const frontmatter = `---\n${startDateProperty}: ${startStr}\n${endDateProperty}: ${endStr}\n---\n\n`;
 
         try {
-          const file = await app.vault.create(fileName, frontmatter);
-          const leaf = app.workspace.getLeaf('tab');
-          await leaf.openFile(file);
+          await app.vault.create(fileName, frontmatter);
         } catch (error) {
           console.error('Failed to create task:', error);
         }

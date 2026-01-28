@@ -200,12 +200,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
     frontmatter += `\n---\n\n`;
 
     try {
-      // Create file in vault root
-      const file = await app.vault.create(fileName, frontmatter);
-
-      // Open the new file for editing
-      const leaf = app.workspace.getLeaf('tab');
-      await leaf.openFile(file);
+      await app.vault.create(fileName, frontmatter);
     } catch (error) {
       console.error('Failed to create new page:', error);
     }
@@ -227,9 +222,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
         const frontmatter = `---\n${groupByProperty}: "${name}"\n---\n\n`;
 
         try {
-          const file = await app.vault.create(fileName, frontmatter);
-          const leaf = app.workspace.getLeaf('tab');
-          await leaf.openFile(file);
+          await app.vault.create(fileName, frontmatter);
         } catch (error) {
           console.error('Failed to create new group:', error);
         }

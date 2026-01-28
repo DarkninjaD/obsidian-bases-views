@@ -110,9 +110,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         const frontmatter = `---\n${dateProperty}: ${dateStr}\n---\n\n`;
 
         try {
-          const file = await app.vault.create(fileName, frontmatter);
-          const leaf = app.workspace.getLeaf('tab');
-          await leaf.openFile(file);
+          await app.vault.create(fileName, frontmatter);
         } catch (error) {
           console.error('Failed to create event:', error);
         }
