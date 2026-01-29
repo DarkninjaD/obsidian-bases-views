@@ -14132,7 +14132,7 @@ function groupEntriesByProperty(entries, propertyName) {
   const groups = /* @__PURE__ */ new Map();
   entries.forEach((entry) => {
     const propertyValue = entry.properties[propertyName];
-    const groupKey = propertyValue !== void 0 && propertyValue !== null ? String(propertyValue) : "Uncategorized";
+    const groupKey = propertyValue !== void 0 && propertyValue !== null ? typeof propertyValue === "object" ? JSON.stringify(propertyValue) : String(propertyValue) : "Uncategorized";
     const group = groups.get(groupKey) || [];
     group.push(entry);
     groups.set(groupKey, group);
@@ -14300,25 +14300,28 @@ function useHoverPreview(app, parent, file) {
 
 // src/utils/noteOpener.ts
 function createNoteOpener(app, file) {
-  return async (event) => {
+  return (event) => {
     event.preventDefault();
     event.stopPropagation();
     const newLeaf = event.ctrlKey || event.metaKey;
     const newTab = event.shiftKey;
-    try {
-      if (newLeaf) {
-        const leaf = app.workspace.getLeaf("split");
-        await leaf.openFile(file);
-      } else if (newTab) {
-        const leaf = app.workspace.getLeaf("tab");
-        await leaf.openFile(file);
-      } else {
-        const leaf = app.workspace.getLeaf(false);
-        await leaf.openFile(file);
+    const openFile = async () => {
+      try {
+        if (newLeaf) {
+          const leaf = app.workspace.getLeaf("split");
+          await leaf.openFile(file);
+        } else if (newTab) {
+          const leaf = app.workspace.getLeaf("tab");
+          await leaf.openFile(file);
+        } else {
+          const leaf = app.workspace.getLeaf(false);
+          await leaf.openFile(file);
+        }
+      } catch (error) {
+        console.error("Failed to open note:", error);
       }
-    } catch (error) {
-      console.error("Failed to open note:", error);
-    }
+    };
+    void openFile();
   };
 }
 
@@ -14786,7 +14789,7 @@ ${subGroupByProperty}: "${subGroupValue}"`;
   const handleNewGroup = React11.useCallback(() => {
     const modal = new TextInputModal(
       app,
-      "New Group",
+      "New group",
       async (name) => {
         if (!name)
           return;
@@ -14812,7 +14815,7 @@ ${groupByProperty}: "${name}"
       return;
     const modal = new TextInputModal(
       app,
-      "New Sub-group",
+      "New sub-group",
       async (name) => {
         var _a;
         if (!name)
@@ -14836,7 +14839,7 @@ ${subGroupByProperty}: "${name}"
     );
     modal.open();
   }, [app, groupByProperty, subGroupByProperty, orderedGroups]);
-  const excludeProperties = [groupByProperty, subGroupByProperty].filter(Boolean);
+  const excludeProperties = [groupByProperty, subGroupByProperty].filter((p) => Boolean(p));
   const hasSubGroups = !!subGroupByProperty && subGroupByProperty.trim() !== "";
   if (hasSubGroups) {
     const allSubGroupKeys = /* @__PURE__ */ new Set();
@@ -18929,7 +18932,8 @@ function entriesToTasks(entries, startDateProperty, endDateProperty, groupByProp
     const endValue = entry.properties[endDateProperty];
     const startDate = parseDate2(startValue);
     const endDate = parseDate2(endValue);
-    const groupValue = groupByProperty ? String(entry.properties[groupByProperty] || "No Group") : void 0;
+    const rawGroupValue = groupByProperty ? entry.properties[groupByProperty] : void 0;
+    const groupValue = groupByProperty ? rawGroupValue !== void 0 && rawGroupValue !== null ? typeof rawGroupValue === "object" ? JSON.stringify(rawGroupValue) : String(rawGroupValue) : "No Group" : void 0;
     if (startDate && endDate) {
       tasks.push({
         id: entry.id,
@@ -19455,7 +19459,7 @@ var TaskBar = ({
   const handleKeyDown = React16.useCallback((e) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      saveTaskName();
+      void saveTaskName();
     } else if (e.key === "Escape") {
       e.preventDefault();
       setEditValue(task.title);
@@ -19500,7 +19504,7 @@ var TaskBar = ({
           className: "bv-gantt-task-title-input",
           value: editValue,
           onChange: (e) => setEditValue(e.target.value),
-          onBlur: saveTaskName,
+          onBlur: () => void saveTaskName(),
           onKeyDown: handleKeyDown,
           onClick: (e) => e.stopPropagation()
         }
@@ -19737,7 +19741,7 @@ var GanttView = ({
     const clickedDate = addDays(timelineStart, dayOffset);
     new TextInputModal(
       app,
-      "New Task",
+      "New task",
       async (name) => {
         if (!name)
           return;
@@ -21600,7 +21604,7 @@ var CalendarView = ({
   const handleCreateEvent = React29.useCallback((date) => {
     new TextInputModal(
       app,
-      "New Event",
+      "New event",
       async (name) => {
         if (!name)
           return;

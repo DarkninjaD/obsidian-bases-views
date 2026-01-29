@@ -211,7 +211,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
   const handleNewGroup = React.useCallback(() => {
     const modal = new TextInputModal(
       app,
-      'New Group',
+      'New group',
       async (name) => {
         if (!name) return;
 
@@ -239,7 +239,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
 
     const modal = new TextInputModal(
       app,
-      'New Sub-group',
+      'New sub-group',
       async (name) => {
         if (!name) return;
 
@@ -262,7 +262,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
   }, [app, groupByProperty, subGroupByProperty, orderedGroups]);
 
   // Properties to exclude from card tags (grouping properties)
-  const excludeProperties = [groupByProperty, subGroupByProperty].filter(Boolean) as string[];
+  const excludeProperties = [groupByProperty, subGroupByProperty].filter((p): p is string => Boolean(p));
 
   const hasSubGroups = !!subGroupByProperty && subGroupByProperty.trim() !== '';
 

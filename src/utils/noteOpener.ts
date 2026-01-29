@@ -12,7 +12,7 @@ import { App, TFile } from 'obsidian';
  * @returns Click handler function
  */
 export function createNoteOpener(app: App, file: TFile) {
-  return async (event: React.MouseEvent) => {
+  return (event: React.MouseEvent): void => {
     event.preventDefault();
     event.stopPropagation();
 
@@ -20,22 +20,26 @@ export function createNoteOpener(app: App, file: TFile) {
     const newLeaf = event.ctrlKey || event.metaKey;
     const newTab = event.shiftKey;
 
-    try {
-      if (newLeaf) {
-        // Open in new split pane
-        const leaf = app.workspace.getLeaf('split');
-        await leaf.openFile(file);
-      } else if (newTab) {
-        // Open in new tab
-        const leaf = app.workspace.getLeaf('tab');
-        await leaf.openFile(file);
-      } else {
-        // Open in current pane
-        const leaf = app.workspace.getLeaf(false);
-        await leaf.openFile(file);
+    const openFile = async () => {
+      try {
+        if (newLeaf) {
+          // Open in new split pane
+          const leaf = app.workspace.getLeaf('split');
+          await leaf.openFile(file);
+        } else if (newTab) {
+          // Open in new tab
+          const leaf = app.workspace.getLeaf('tab');
+          await leaf.openFile(file);
+        } else {
+          // Open in current pane
+          const leaf = app.workspace.getLeaf(false);
+          await leaf.openFile(file);
+        }
+      } catch (error) {
+        console.error('Failed to open note:', error);
       }
-    } catch (error) {
-      console.error('Failed to open note:', error);
-    }
+    };
+
+    void openFile();
   };
 }

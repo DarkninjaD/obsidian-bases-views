@@ -122,7 +122,7 @@ export const GanttView: React.FC<GanttViewProps> = ({
     // Show modal to get task name
     new TextInputModal(
       app,
-      'New Task',
+      'New task',
       async (name) => {
         if (!name) return;
 

@@ -98,7 +98,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   const handleCreateEvent = React.useCallback((date: Date) => {
     new TextInputModal(
       app,
-      'New Event',
+      'New event',
       async (name) => {
         if (!name) return;
 

@@ -4,7 +4,7 @@ import { TaskGroup } from '../../../types/view-config';
 interface GanttGroupHeaderProps {
   group: TaskGroup;
   onToggle: (groupName: string) => void;
-  onRenameGroup?: (oldName: string, newName: string) => void;
+  onRenameGroup?: (oldName: string, newName: string) => void | Promise<void>;
   timelineWidth: string;
 }
 

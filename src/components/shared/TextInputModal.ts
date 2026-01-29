@@ -6,14 +6,14 @@ import { App, Modal, Setting } from 'obsidian';
  */
 export class TextInputModal extends Modal {
   private result: string = '';
-  private onSubmit: (result: string) => void;
+  private onSubmit: (result: string) => void | Promise<void>;
   private title: string;
   private placeholder: string;
 
   constructor(
     app: App,
     title: string,
-    onSubmit: (result: string) => void,
+    onSubmit: (result: string) => void | Promise<void>,
     placeholder: string = ''
   ) {
     super(app);

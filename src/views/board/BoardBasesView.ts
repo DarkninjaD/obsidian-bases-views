@@ -62,7 +62,7 @@ export class BoardBasesView extends ReactBasesView {
   /**
    * Static method to define view options
    */
-  static getViewOptions() {
+  static getViewOptions(this: void) {
     return [
       {
         key: 'groupByProperty',

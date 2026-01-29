@@ -17,7 +17,7 @@ interface ColumnProps {
   app: App;
   hoverParent: HoverParent;
   /** Callback when user clicks "+ New page" button */
-  onNewPage?: (dropId: string) => void;
+  onNewPage?: (dropId: string) => void | Promise<void>;
   /** Properties to exclude from card tag display */
   excludeProperties?: string[];
 }

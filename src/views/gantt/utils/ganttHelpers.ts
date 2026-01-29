@@ -28,8 +28,13 @@ export function entriesToTasks(
     const endDate = parseDate(endValue);
 
     // Get group value if grouping is enabled
+    const rawGroupValue = groupByProperty ? entry.properties[groupByProperty] : undefined;
     const groupValue = groupByProperty
-      ? String(entry.properties[groupByProperty] || 'No Group')
+      ? (rawGroupValue !== undefined && rawGroupValue !== null
+          ? (typeof rawGroupValue === 'object'
+              ? JSON.stringify(rawGroupValue)
+              : String(rawGroupValue))
+          : 'No Group')
       : undefined;
 
     // Only include entries with valid dates

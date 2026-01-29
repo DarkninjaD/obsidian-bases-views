@@ -18,7 +18,9 @@ export function groupEntriesByProperty(
     // Get the property value, default to 'Uncategorized' if not set
     const propertyValue = entry.properties[propertyName];
     const groupKey = propertyValue !== undefined && propertyValue !== null
-      ? String(propertyValue)
+      ? (typeof propertyValue === 'object'
+          ? JSON.stringify(propertyValue)
+          : String(propertyValue))
       : 'Uncategorized';
 
     // Add entry to the appropriate group

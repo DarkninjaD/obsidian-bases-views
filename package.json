@@ -1,11 +1,12 @@
 {
   "name": "obsidian-bases-view-plugin",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Custom Bases views: Board, Gantt, and Calendar for Obsidian",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
     "build": "node esbuild.config.mjs production",
+    "lint": "eslint src/",
     "version": "node version-bump.mjs && git add manifest.json versions.json"
   },
   "keywords": [

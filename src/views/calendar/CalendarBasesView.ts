@@ -59,7 +59,7 @@ export class CalendarBasesView extends ReactBasesView {
    * Static method to define view options
    * Uses same property IDs as Gantt view for consistency
    */
-  static getViewOptions() {
+  static getViewOptions(this: void) {
     return [
       {
         key: 'startDateProperty',

@@ -8,13 +8,13 @@ export class NewEventModal extends Modal {
   private eventName: string = '';
   private startTime: Date;
   private endTime: Date;
-  private onSubmit: (name: string, startTime: Date, endTime: Date) => void;
+  private onSubmit: (name: string, startTime: Date, endTime: Date) => void | Promise<void>;
 
   constructor(
     app: App,
     defaultStartTime: Date,
     defaultEndTime: Date,
-    onSubmit: (name: string, startTime: Date, endTime: Date) => void
+    onSubmit: (name: string, startTime: Date, endTime: Date) => void | Promise<void>
   ) {
     super(app);
     this.startTime = defaultStartTime;

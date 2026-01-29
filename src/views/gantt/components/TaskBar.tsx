@@ -141,7 +141,7 @@ export const TaskBar: React.FC<TaskBarProps> = ({
   const handleKeyDown = React.useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      saveTaskName();
+      void saveTaskName();
     } else if (e.key === 'Escape') {
       e.preventDefault();
       setEditValue(task.title);
@@ -185,7 +185,7 @@ export const TaskBar: React.FC<TaskBarProps> = ({
             className="bv-gantt-task-title-input"
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
-            onBlur={saveTaskName}
+            onBlur={() => void saveTaskName()}
             onKeyDown={handleKeyDown}
             onClick={(e) => e.stopPropagation()}
           />
