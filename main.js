@@ -7871,6 +7871,8 @@ var import_obsidian4 = require("obsidian");
     --leading-snug: 1.375;
     --radius-md: 0.375rem;
     --radius-lg: 0.5rem;
+    --default-transition-duration: 150ms;
+    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
   }
@@ -8057,14 +8059,32 @@ var import_obsidian4 = require("obsidian");
       max-width: 96rem;
     }
   }
+  .block {
+    display: block;
+  }
   .contents {
     display: contents;
+  }
+  .flex {
+    display: flex;
   }
   .grid {
     display: grid;
   }
+  .hidden {
+    display: none;
+  }
   .inline {
     display: inline;
+  }
+  .table {
+    display: table;
+  }
+  .flex-shrink {
+    flex-shrink: 1;
+  }
+  .border-collapse {
+    border-collapse: collapse;
   }
   .transform {
     transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
@@ -8072,12 +8092,40 @@ var import_obsidian4 = require("obsidian");
   .resize {
     resize: both;
   }
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
   .border {
     border-style: var(--tw-border-style);
     border-width: 1px;
   }
+  .capitalize {
+    text-transform: capitalize;
+  }
+  .lowercase {
+    text-transform: lowercase;
+  }
+  .uppercase {
+    text-transform: uppercase;
+  }
+  .underline {
+    text-decoration-line: underline;
+  }
+  .outline {
+    outline-style: var(--tw-outline-style);
+    outline-width: 1px;
+  }
+  .blur {
+    --tw-blur: blur(8px);
+    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
   .filter {
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
+  .transition {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, content-visibility, overlay, pointer-events;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
   }
 }
 .bv-board-view {
@@ -8296,8 +8344,16 @@ var import_obsidian4 = require("obsidian");
 .bv-section-new-group {
   display: flex;
   flex-shrink: 0;
-  align-items: center;
+  align-items: flex-start;
   min-width: 8rem;
+  padding-top: 0.5rem;
+}
+.bv-board-new-subgroup {
+  display: flex;
+  align-items: center;
+  padding-inline: calc(var(--spacing) * 3);
+  padding-block: calc(var(--spacing) * 2);
+  border-top: 1px solid var(--background-modifier-border);
 }
 .bv-row-header {
   display: flex;
@@ -9052,9 +9108,7 @@ var import_obsidian4 = require("obsidian");
   bottom: 0;
   pointer-events: none;
   z-index: 2;
-  background-image: repeating-linear-gradient( to right, transparent 0, transparent calc(14.2857% - 0.5px), var(--background-modifier-border) calc(14.2857% - 0.5px), var(--background-modifier-border) 14.2857% );
-  background-position: 14.2857% 0;
-  background-size: 100% 100%;
+  background-image: repeating-linear-gradient( to right, transparent 0, transparent calc(100% / 7 - 1px), var(--background-modifier-border) calc(100% / 7 - 1px), var(--background-modifier-border) calc(100% / 7) );
 }
 .bv-calendar-day-numbers-row {
   display: flex;
@@ -9148,7 +9202,7 @@ var import_obsidian4 = require("obsidian");
   height: 20px;
   background: var(--interactive-accent);
   color: var(--text-on-accent);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.15s ease;
 }
 .bv-calendar-event:hover {
   transform: translateY(-1px);
@@ -9158,6 +9212,9 @@ var import_obsidian4 = require("obsidian");
   opacity: 0.4;
   box-shadow: none;
   transform: none;
+}
+.bv-calendar-event.bv-event-updated {
+  animation: bv-event-pulse 0.3s ease;
 }
 .bv-calendar-event-title {
   overflow: hidden;
@@ -9180,12 +9237,26 @@ var import_obsidian4 = require("obsidian");
   color: var(--text-on-accent);
   font-size: 11px;
   font-weight: 500;
-  transition: box-shadow 0.15s ease;
+  transition: box-shadow 0.15s ease, grid-column 0.2s ease, opacity 0.15s ease;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   z-index: 1;
   position: relative;
+}
+@keyframes bv-event-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.bv-calendar-multi-day-event.bv-event-updated {
+  animation: bv-event-pulse 0.3s ease;
 }
 .bv-calendar-multi-day-event:hover {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -9579,6 +9650,11 @@ var import_obsidian4 = require("obsidian");
   inherits: false;
   initial-value: solid;
 }
+@property --tw-outline-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
 @property --tw-blur {
   syntax: "*";
   inherits: false;
@@ -9649,6 +9725,7 @@ var import_obsidian4 = require("obsidian");
       --tw-skew-x: initial;
       --tw-skew-y: initial;
       --tw-border-style: solid;
+      --tw-outline-style: solid;
       --tw-blur: initial;
       --tw-brightness: initial;
       --tw-contrast: initial;
@@ -9684,25 +9761,18 @@ var import_obsidian = require("obsidian");
 var import_client = __toESM(require_client());
 var ReactBasesView = class extends import_obsidian.BasesView {
   constructor(controller, containerEl) {
-    console.log("ReactBasesView constructor called");
     super(controller);
     this.root = null;
     // Implement HoverParent interface
     this.hoverPopover = null;
     this.containerEl = containerEl;
     this.containerEl.addClass("bases-view-container");
-    console.log("ReactBasesView constructor completed");
   }
   /**
    * Component lifecycle - called when view is loaded
    */
   onload() {
-    var _a, _b, _c, _d;
     super.onload();
-    console.log("ReactBasesView.onload() called");
-    console.log("  this.data:", this.data);
-    console.log("  this.data.data length:", (_b = (_a = this.data) == null ? void 0 : _a.data) == null ? void 0 : _b.length);
-    console.log("  this.data.groupedData length:", (_d = (_c = this.data) == null ? void 0 : _c.groupedData) == null ? void 0 : _d.length);
     if (this.data) {
       this.render();
     } else {
@@ -9715,18 +9785,13 @@ var ReactBasesView = class extends import_obsidian.BasesView {
   showLoadingMessage() {
     this.containerEl.empty();
     const loadingDiv = this.containerEl.createDiv({ cls: "bv-loading" });
-    loadingDiv.createEl("div", { text: "Loading data from Bases..." });
+    loadingDiv.createEl("div", { text: "Loading data from bases..." });
   }
   /**
    * Render or re-render the React component
    */
   render() {
-    var _a, _b;
-    console.log("ReactBasesView.render() called");
-    console.log("  this.data:", this.data);
-    console.log("  this.data.data length:", (_b = (_a = this.data) == null ? void 0 : _a.data) == null ? void 0 : _b.length);
     if (!this.data) {
-      console.warn("ReactBasesView.render() skipped - no data object");
       this.showLoadingMessage();
       return;
     }
@@ -9741,17 +9806,9 @@ var ReactBasesView = class extends import_obsidian.BasesView {
    * This is a notification - data is in this.data property.
    */
   onDataUpdated() {
-    var _a, _b, _c, _d;
-    console.log("ReactBasesView.onDataUpdated() called");
-    console.log("  this.data:", this.data);
-    console.log("  this.data type:", typeof this.data);
-    console.log("  this.data.data length:", (_b = (_a = this.data) == null ? void 0 : _a.data) == null ? void 0 : _b.length);
-    console.log("  this.data.groupedData length:", (_d = (_c = this.data) == null ? void 0 : _c.groupedData) == null ? void 0 : _d.length);
     if (this.data) {
-      console.log("  \u2713 Data object exists, rendering...");
       this.render();
     } else {
-      console.warn("  \u2717 No data object yet");
       this.showLoadingMessage();
     }
   }
@@ -9760,7 +9817,6 @@ var ReactBasesView = class extends import_obsidian.BasesView {
    * Unmounts React component and cleans up resources.
    */
   onunload() {
-    console.log("ReactBasesView.onunload() called");
     if (this.root) {
       this.root.unmount();
       this.root = null;
@@ -14042,51 +14098,32 @@ var import_react5 = __toESM(require_react());
 // src/utils/basesDataAdapter.ts
 function adaptBasesData(result, app) {
   const entries = [];
-  console.log("adaptBasesData: called with result:", result);
-  console.log("adaptBasesData: result.data:", result == null ? void 0 : result.data);
-  console.log("adaptBasesData: result.data is array?", Array.isArray(result == null ? void 0 : result.data));
   if (!result || !Array.isArray(result.data)) {
-    console.warn("adaptBasesData: result is null or invalid");
     return entries;
   }
-  console.log("adaptBasesData: processing", result.data.length, "entries");
-  result.data.forEach((obsidianEntry, index) => {
-    var _a;
-    console.log(`adaptBasesData: entry ${index}:`, obsidianEntry);
-    console.log(`adaptBasesData: entry ${index} file:`, obsidianEntry.file);
-    console.log(`adaptBasesData: entry ${index} file.path:`, (_a = obsidianEntry.file) == null ? void 0 : _a.path);
+  result.data.forEach((obsidianEntry) => {
     const properties2 = extractAllProperties(obsidianEntry, app);
-    console.log(`adaptBasesData: entry ${index} properties:`, properties2);
     entries.push({
       id: obsidianEntry.file.path,
       file: obsidianEntry.file,
       properties: properties2
     });
   });
-  console.log("adaptBasesData: returning", entries.length, "entries");
   return entries;
 }
 function extractAllProperties(entry, app) {
   const properties2 = {};
-  console.log("extractAllProperties: processing entry for file:", entry.file.path);
   const cache = app.metadataCache.getFileCache(entry.file);
-  console.log("extractAllProperties: cache:", cache);
-  console.log("extractAllProperties: frontmatter:", cache == null ? void 0 : cache.frontmatter);
   if (!cache) {
-    console.warn("extractAllProperties: cache is undefined for file:", entry.file.path);
     return properties2;
   }
   if (cache.frontmatter) {
     Object.entries(cache.frontmatter).forEach(([key2, value]) => {
       if (key2 !== "position") {
         properties2[key2] = value;
-        console.log(`extractAllProperties: added property ${key2}:`, value);
       }
     });
-  } else {
-    console.warn("extractAllProperties: no frontmatter found for file:", entry.file.path);
   }
-  console.log("extractAllProperties: final properties:", properties2);
   return properties2;
 }
 
@@ -14134,9 +14171,6 @@ function useBoardData(data, app, initialGroupByProperty, initialSubGroupByProper
     setSubGroupByProperty(initialSubGroupByProperty || "");
   }, [initialSubGroupByProperty]);
   const entries = (0, import_react5.useMemo)(() => {
-    var _a;
-    console.log("useBoardData: processing data:", data);
-    console.log("useBoardData: data.data length:", (_a = data == null ? void 0 : data.data) == null ? void 0 : _a.length);
     return adaptBasesData(data, app);
   }, [data, app]);
   const groups = (0, import_react5.useMemo)(() => {
@@ -14190,14 +14224,11 @@ var import_react6 = __toESM(require_react());
 // src/utils/propertyUpdater.ts
 async function updateFileProperty(app, file, propertyName, value) {
   try {
-    console.log(`updateFileProperty: updating ${file.path} - ${propertyName} = ${value}`);
     await app.fileManager.processFrontMatter(file, (frontmatter) => {
       frontmatter[propertyName] = formatValue(value);
-      console.log(`updateFileProperty: frontmatter updated:`, frontmatter);
     });
-    console.log(`updateFileProperty: \u2713 successfully updated ${propertyName}`);
   } catch (error) {
-    console.error("updateFileProperty: \u2717 failed to update property:", error);
+    console.error("Failed to update property:", error);
     throw error;
   }
 }
@@ -14726,10 +14757,10 @@ var BoardView = ({
     const currentGroupValue = entry.properties[groupByProperty];
     const currentSubGroupValue = subGroupByProperty ? entry.properties[subGroupByProperty] : void 0;
     if (String(currentGroupValue) !== newGroupValue) {
-      updateProperty(entry.file, groupByProperty, newGroupValue);
+      void updateProperty(entry.file, groupByProperty, newGroupValue);
     }
     if (subGroupByProperty && newSubGroupValue && String(currentSubGroupValue) !== newSubGroupValue) {
-      updateProperty(entry.file, subGroupByProperty, newSubGroupValue);
+      void updateProperty(entry.file, subGroupByProperty, newSubGroupValue);
     }
   };
   const handleNewPage = React11.useCallback(async (dropId) => {
@@ -14776,6 +14807,35 @@ ${groupByProperty}: "${name}"
     );
     modal.open();
   }, [app, groupByProperty]);
+  const handleNewSubGroup = React11.useCallback(() => {
+    if (!subGroupByProperty)
+      return;
+    const modal = new TextInputModal(
+      app,
+      "New Sub-group",
+      async (name) => {
+        var _a;
+        if (!name)
+          return;
+        const timestamp = Date.now();
+        const fileName = `${name} ${timestamp}.md`;
+        const firstGroupValue = ((_a = orderedGroups[0]) == null ? void 0 : _a[0]) || "Uncategorized";
+        const frontmatter = `---
+${groupByProperty}: "${firstGroupValue}"
+${subGroupByProperty}: "${name}"
+---
+
+`;
+        try {
+          await app.vault.create(fileName, frontmatter);
+        } catch (error) {
+          console.error("Failed to create new sub-group:", error);
+        }
+      },
+      "Enter sub-group name"
+    );
+    modal.open();
+  }, [app, groupByProperty, subGroupByProperty, orderedGroups]);
   const excludeProperties = [groupByProperty, subGroupByProperty].filter(Boolean);
   const hasSubGroups = !!subGroupByProperty && subGroupByProperty.trim() !== "";
   if (hasSubGroups) {
@@ -14785,7 +14845,13 @@ ${groupByProperty}: "${name}"
         allSubGroupKeys.add(subGroupKey);
       });
     });
-    const subGroupKeys = Array.from(allSubGroupKeys).sort();
+    const subGroupKeys = Array.from(allSubGroupKeys).sort((a, b) => {
+      if (a === "Uncategorized")
+        return -1;
+      if (b === "Uncategorized")
+        return 1;
+      return a.localeCompare(b);
+    });
     return /* @__PURE__ */ React11.createElement("div", { className: "bv-board-view bv-board-notion" }, /* @__PURE__ */ React11.createElement(DndContext, { sensors, onDragStart: handleDragStart, onDragEnd: handleDragEnd, collisionDetection: cellOnlyCollision }, /* @__PURE__ */ React11.createElement("div", { className: "bv-board-header" }, /* @__PURE__ */ React11.createElement(
       SortableContext,
       {
@@ -14805,7 +14871,7 @@ ${groupByProperty}: "${name}"
           }
         );
       })
-    ), /* @__PURE__ */ React11.createElement("div", { className: "bv-board-header-new-group" }, /* @__PURE__ */ React11.createElement("button", { className: "bv-new-group-btn", onClick: handleNewGroup }, "+ New group"))), /* @__PURE__ */ React11.createElement("div", { className: "bv-board-sections" }, subGroupKeys.map((subGroupKey) => {
+    )), /* @__PURE__ */ React11.createElement("div", { className: "bv-board-sections" }, subGroupKeys.map((subGroupKey) => {
       const isCollapsed = collapsedRows.has(subGroupKey);
       const sectionEntryCount = orderedGroups.reduce((sum, [groupTitle]) => {
         var _a;
@@ -14844,9 +14910,9 @@ ${groupByProperty}: "${name}"
               excludeProperties
             }
           );
-        }))
+        }), /* @__PURE__ */ React11.createElement("div", { className: "bv-section-new-group" }, /* @__PURE__ */ React11.createElement("button", { className: "bv-new-group-btn", onClick: handleNewGroup }, "+ New group")))
       );
-    })), /* @__PURE__ */ React11.createElement(DragOverlay, { dropAnimation: null }, activeEntry && /* @__PURE__ */ React11.createElement(
+    }), /* @__PURE__ */ React11.createElement("div", { className: "bv-board-new-subgroup" }, /* @__PURE__ */ React11.createElement("button", { className: "bv-new-group-btn", onClick: handleNewSubGroup }, "+ New sub-group"))), /* @__PURE__ */ React11.createElement(DragOverlay, { dropAnimation: null }, activeEntry && /* @__PURE__ */ React11.createElement(
       Card,
       {
         entry: activeEntry,
@@ -14917,10 +14983,8 @@ var ErrorBoundary = class extends import_react8.default.Component {
 var BoardViewType = "bases-board";
 var BoardBasesView = class extends ReactBasesView {
   constructor(controller, containerEl) {
-    console.log("BoardBasesView constructor called");
     super(controller, containerEl);
     this.type = BoardViewType;
-    console.log("BoardBasesView constructor completed");
   }
   /**
    * Extract property name from BasesPropertyId (format: "type.propertyName")
@@ -14938,10 +15002,8 @@ var BoardBasesView = class extends ReactBasesView {
     const rawGroupBy = this.config.get("groupByProperty");
     const rawSubGroupBy = this.config.get("subGroupByProperty");
     const columnOrder = this.config.get("columnOrder") || [];
-    console.log("BoardBasesView: raw config values:", { rawGroupBy, rawSubGroupBy, columnOrder });
     const groupByProperty = this.extractPropertyName(rawGroupBy) || "status";
     const subGroupByProperty = this.extractPropertyName(rawSubGroupBy) || "";
-    console.log("BoardBasesView: extracted properties:", { groupByProperty, subGroupByProperty });
     return React13.createElement(
       ErrorBoundary,
       {},
@@ -15167,6 +15229,20 @@ function addWeeks(date, amount) {
   return addDays(date, days);
 }
 
+// node_modules/date-fns/compareAsc.mjs
+function compareAsc(dateLeft, dateRight) {
+  const _dateLeft = toDate(dateLeft);
+  const _dateRight = toDate(dateRight);
+  const diff = _dateLeft.getTime() - _dateRight.getTime();
+  if (diff < 0) {
+    return -1;
+  } else if (diff > 0) {
+    return 1;
+  } else {
+    return diff;
+  }
+}
+
 // node_modules/date-fns/constructNow.mjs
 function constructNow(date) {
   return constructFrom(date, Date.now());
@@ -15191,6 +15267,15 @@ function isValid(date) {
   }
   const _date = toDate(date);
   return !isNaN(Number(_date));
+}
+
+// node_modules/date-fns/differenceInCalendarMonths.mjs
+function differenceInCalendarMonths(dateLeft, dateRight) {
+  const _dateLeft = toDate(dateLeft);
+  const _dateRight = toDate(dateRight);
+  const yearDiff = _dateLeft.getFullYear() - _dateRight.getFullYear();
+  const monthDiff = _dateLeft.getMonth() - _dateRight.getMonth();
+  return yearDiff * 12 + monthDiff;
 }
 
 // node_modules/date-fns/differenceInDays.mjs
@@ -15253,6 +15338,43 @@ function endOfMonth(date) {
   return _date;
 }
 
+// node_modules/date-fns/isLastDayOfMonth.mjs
+function isLastDayOfMonth(date) {
+  const _date = toDate(date);
+  return +endOfDay(_date) === +endOfMonth(_date);
+}
+
+// node_modules/date-fns/differenceInMonths.mjs
+function differenceInMonths(dateLeft, dateRight) {
+  const _dateLeft = toDate(dateLeft);
+  const _dateRight = toDate(dateRight);
+  const sign = compareAsc(_dateLeft, _dateRight);
+  const difference = Math.abs(
+    differenceInCalendarMonths(_dateLeft, _dateRight)
+  );
+  let result;
+  if (difference < 1) {
+    result = 0;
+  } else {
+    if (_dateLeft.getMonth() === 1 && _dateLeft.getDate() > 27) {
+      _dateLeft.setDate(30);
+    }
+    _dateLeft.setMonth(_dateLeft.getMonth() - sign * difference);
+    let isLastMonthNotFull = compareAsc(_dateLeft, _dateRight) === -sign;
+    if (isLastDayOfMonth(toDate(dateLeft)) && difference === 1 && compareAsc(dateLeft, _dateRight) === 1) {
+      isLastMonthNotFull = false;
+    }
+    result = sign * (difference - Number(isLastMonthNotFull));
+  }
+  return result === 0 ? 0 : result;
+}
+
+// node_modules/date-fns/differenceInWeeks.mjs
+function differenceInWeeks(dateLeft, dateRight, options) {
+  const diff = differenceInDays(dateLeft, dateRight) / 7;
+  return getRoundingMethod(options == null ? void 0 : options.roundingMethod)(diff);
+}
+
 // node_modules/date-fns/eachDayOfInterval.mjs
 function eachDayOfInterval(interval, options) {
   var _a;
@@ -15274,6 +15396,60 @@ function eachDayOfInterval(interval, options) {
     dates.push(toDate(currentDate));
     currentDate.setDate(currentDate.getDate() + step);
     currentDate.setHours(0, 0, 0, 0);
+  }
+  return reversed ? dates.reverse() : dates;
+}
+
+// node_modules/date-fns/eachMonthOfInterval.mjs
+function eachMonthOfInterval(interval, options) {
+  var _a;
+  const startDate = toDate(interval.start);
+  const endDate = toDate(interval.end);
+  let reversed = +startDate > +endDate;
+  const endTime = reversed ? +startDate : +endDate;
+  const currentDate = reversed ? endDate : startDate;
+  currentDate.setHours(0, 0, 0, 0);
+  currentDate.setDate(1);
+  let step = (_a = options == null ? void 0 : options.step) != null ? _a : 1;
+  if (!step)
+    return [];
+  if (step < 0) {
+    step = -step;
+    reversed = !reversed;
+  }
+  const dates = [];
+  while (+currentDate <= endTime) {
+    dates.push(toDate(currentDate));
+    currentDate.setMonth(currentDate.getMonth() + step);
+  }
+  return reversed ? dates.reverse() : dates;
+}
+
+// node_modules/date-fns/eachWeekOfInterval.mjs
+function eachWeekOfInterval(interval, options) {
+  var _a;
+  const startDate = toDate(interval.start);
+  const endDate = toDate(interval.end);
+  let reversed = +startDate > +endDate;
+  const startDateWeek = reversed ? startOfWeek(endDate, options) : startOfWeek(startDate, options);
+  const endDateWeek = reversed ? startOfWeek(startDate, options) : startOfWeek(endDate, options);
+  startDateWeek.setHours(15);
+  endDateWeek.setHours(15);
+  const endTime = +endDateWeek.getTime();
+  let currentDate = startDateWeek;
+  let step = (_a = options == null ? void 0 : options.step) != null ? _a : 1;
+  if (!step)
+    return [];
+  if (step < 0) {
+    step = -step;
+    reversed = !reversed;
+  }
+  const dates = [];
+  while (+currentDate <= endTime) {
+    currentDate.setHours(0);
+    dates.push(toDate(currentDate));
+    currentDate = addWeeks(currentDate, step);
+    currentDate.setHours(15);
   }
   return reversed ? dates.reverse() : dates;
 }
@@ -18869,7 +19045,23 @@ function calculateTaskPosition(taskStart, taskEnd, timelineStart, timelineEnd) {
     width: taskSpan / timelineSpan * 100
   };
 }
-function generateTimelineMarkers(timelineStart, timelineEnd) {
+function generateTimelineMarkers(timelineStart, timelineEnd, step = "day") {
+  if (step === "week") {
+    const weeks = eachWeekOfInterval({ start: timelineStart, end: timelineEnd }, { weekStartsOn: 1 });
+    return weeks.map((date) => ({
+      date,
+      label: format(date, "d MMM"),
+      isMonthStart: date.getDate() <= 7
+    }));
+  }
+  if (step === "month") {
+    const months = eachMonthOfInterval({ start: timelineStart, end: timelineEnd });
+    return months.map((date) => ({
+      date,
+      label: format(date, "MMM yyyy"),
+      isMonthStart: true
+    }));
+  }
   const days = eachDayOfInterval({ start: timelineStart, end: timelineEnd });
   return days.map((date) => ({
     date,
@@ -18877,9 +19069,24 @@ function generateTimelineMarkers(timelineStart, timelineEnd) {
     isMonthStart: date.getDate() === 1
   }));
 }
-function calculateDateFromDelta(originalDate, pixelDelta, pixelsPerDay) {
-  const daysDelta = Math.round(pixelDelta / pixelsPerDay);
-  return addDays(originalDate, daysDelta);
+function getTimelineUnitCount(timelineStart, timelineEnd, step = "day") {
+  if (step === "week") {
+    return differenceInWeeks(timelineEnd, timelineStart) + 1;
+  }
+  if (step === "month") {
+    return differenceInMonths(timelineEnd, timelineStart) + 1;
+  }
+  return differenceInDays(timelineEnd, timelineStart) + 1;
+}
+function calculateDateFromDelta(originalDate, pixelDelta, pixelsPerUnit, step = "day") {
+  const unitsDelta = Math.round(pixelDelta / pixelsPerUnit);
+  if (step === "week") {
+    return addWeeks(originalDate, unitsDelta);
+  }
+  if (step === "month") {
+    return addMonths(originalDate, unitsDelta);
+  }
+  return addDays(originalDate, unitsDelta);
 }
 
 // src/views/gantt/hooks/useGanttData.ts
@@ -18945,38 +19152,38 @@ function useGanttData(data, app, initialStartProperty, initialEndProperty, initi
 }
 
 // src/views/gantt/components/Timeline.tsx
-var import_react10 = __toESM(require_react());
-var Timeline = ({ start, end }) => {
-  const markers = generateTimelineMarkers(start, end);
+var React14 = __toESM(require_react());
+var Timeline = ({ start, end, step }) => {
+  const markers = generateTimelineMarkers(start, end, step || "day");
   const dayWidth = `${100 / markers.length}%`;
-  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "bv-gantt-timeline" }, markers.map((marker, index) => /* @__PURE__ */ import_react10.default.createElement(
+  return /* @__PURE__ */ React14.createElement("div", { className: "bv-gantt-timeline" }, markers.map((marker, index) => /* @__PURE__ */ React14.createElement(
     "div",
     {
       key: index,
       className: `bv-gantt-timeline-day ${marker.isMonthStart ? "bv-gantt-timeline-month-start" : ""}`,
       style: { width: dayWidth }
     },
-    marker.isMonthStart && /* @__PURE__ */ import_react10.default.createElement("div", { className: "bv-gantt-timeline-month" }, format(marker.date, "MMM yyyy")),
-    /* @__PURE__ */ import_react10.default.createElement("div", { className: "bv-gantt-timeline-date" }, marker.label)
+    marker.isMonthStart && /* @__PURE__ */ React14.createElement("div", { className: "bv-gantt-timeline-month" }, format(marker.date, "MMM yyyy")),
+    /* @__PURE__ */ React14.createElement("div", { className: "bv-gantt-timeline-date" }, marker.label)
   )));
 };
 
 // src/views/gantt/components/Grid.tsx
-var import_react11 = __toESM(require_react());
-var Grid = ({ start, end, rowCount }) => {
-  const dayCount = differenceInDays(end, start) + 1;
-  const columnWidth = `${100 / dayCount}%`;
-  return /* @__PURE__ */ import_react11.default.createElement("div", { className: "bv-gantt-grid" }, Array.from({ length: dayCount }).map((_, index) => /* @__PURE__ */ import_react11.default.createElement(
+var React15 = __toESM(require_react());
+var Grid = ({ start, end, rowCount, step }) => {
+  const unitCount = getTimelineUnitCount(start, end, step || "day");
+  const columnWidth = `${100 / unitCount}%`;
+  return /* @__PURE__ */ React15.createElement("div", { className: "bv-gantt-grid" }, Array.from({ length: unitCount }).map((_, index) => /* @__PURE__ */ React15.createElement(
     "div",
     {
       key: `col-${index}`,
       className: "bv-gantt-grid-column",
       style: {
-        left: `${index / dayCount * 100}%`,
+        left: `${index / unitCount * 100}%`,
         width: columnWidth
       }
     }
-  )), Array.from({ length: rowCount }).map((_, index) => /* @__PURE__ */ import_react11.default.createElement(
+  )), Array.from({ length: rowCount }).map((_, index) => /* @__PURE__ */ React15.createElement(
     "div",
     {
       key: `row-${index}`,
@@ -18993,30 +19200,33 @@ var Grid = ({ start, end, rowCount }) => {
 var React16 = __toESM(require_react());
 
 // src/views/gantt/hooks/useTaskResize.ts
-var import_react12 = __toESM(require_react());
+var import_react10 = __toESM(require_react());
 function useTaskResize({
   task,
   app,
   timelineStart,
   timelineEnd,
-  chartRef
+  chartRef,
+  onResizeEnd,
+  timelineStep
 }) {
-  const [isResizing, setIsResizing] = (0, import_react12.useState)(false);
-  const resizeTypeRef = (0, import_react12.useRef)(null);
-  const hadMovementRef = (0, import_react12.useRef)(false);
+  const [isResizing, setIsResizing] = (0, import_react10.useState)(false);
+  const resizeTypeRef = (0, import_react10.useRef)(null);
+  const hadMovementRef = (0, import_react10.useRef)(false);
   const { updateProperty } = usePropertyUpdate(app);
-  const getPixelsPerDay = (0, import_react12.useCallback)(() => {
+  const step = timelineStep || "day";
+  const getPixelsPerUnit = (0, import_react10.useCallback)(() => {
     var _a;
-    const totalDays = differenceInDays(timelineEnd, timelineStart) + 1;
+    const totalUnits = getTimelineUnitCount(timelineStart, timelineEnd, step);
     const chartWidth = ((_a = chartRef.current) == null ? void 0 : _a.getBoundingClientRect().width) || 1e3;
-    return chartWidth / totalDays;
-  }, [timelineStart, timelineEnd, chartRef]);
-  const consumeHadMovement = (0, import_react12.useCallback)(() => {
+    return chartWidth / totalUnits;
+  }, [timelineStart, timelineEnd, chartRef, step]);
+  const consumeHadMovement = (0, import_react10.useCallback)(() => {
     const had = hadMovementRef.current;
     hadMovementRef.current = false;
     return had;
   }, []);
-  const handleResizeStart = (0, import_react12.useCallback)(
+  const handleResizeStart = (0, import_react10.useCallback)(
     (e, handle) => {
       e.preventDefault();
       e.stopPropagation();
@@ -19025,22 +19235,22 @@ function useTaskResize({
       resizeTypeRef.current = handle;
       const startX = e.clientX;
       const originalDate = handle === "start" ? task.startDate : task.endDate;
-      const pixelsPerDay = getPixelsPerDay();
+      const pixelsPerUnit = getPixelsPerUnit();
       const handleMouseMove = (moveEvent) => {
         const deltaX = moveEvent.clientX - startX;
         if (Math.abs(deltaX) > 3) {
           hadMovementRef.current = true;
         }
-        const newDate = calculateDateFromDelta(originalDate, deltaX, pixelsPerDay);
+        const newDate = calculateDateFromDelta(originalDate, deltaX, pixelsPerUnit, step);
         const propertyName = handle === "start" ? task.startDateProperty : task.endDateProperty;
         if (newDate.getTime() !== originalDate.getTime()) {
-          if (handle === "start" && newDate >= task.endDate) {
+          if (handle === "start" && newDate > task.endDate) {
             return;
           }
-          if (handle === "end" && newDate <= task.startDate) {
+          if (handle === "end" && newDate < task.startDate) {
             return;
           }
-          updateProperty(task.file, propertyName, newDate.toISOString());
+          void updateProperty(task.file, propertyName, newDate.toISOString());
         }
       };
       const handleMouseUp = () => {
@@ -19048,11 +19258,12 @@ function useTaskResize({
         resizeTypeRef.current = null;
         document.removeEventListener("mousemove", handleMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
+        onResizeEnd == null ? void 0 : onResizeEnd();
       };
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     },
-    [task, updateProperty, getPixelsPerDay]
+    [task, updateProperty, getPixelsPerUnit, step, onResizeEnd]
   );
   return {
     isResizing,
@@ -19063,7 +19274,7 @@ function useTaskResize({
 }
 
 // src/views/gantt/hooks/useTaskDrag.ts
-var import_react13 = __toESM(require_react());
+var import_react11 = __toESM(require_react());
 function findGroupAtPosition(y, groups, rowHeight) {
   const row = Math.floor(y / rowHeight);
   for (const group of groups) {
@@ -19081,25 +19292,28 @@ function useTaskDrag({
   timelineEnd,
   groups,
   groupByProperty,
-  chartRef
+  chartRef,
+  onDragEnd,
+  timelineStep
 }) {
-  const [isDragging, setIsDragging] = (0, import_react13.useState)(false);
-  const dragStartRef = (0, import_react13.useRef)(null);
-  const hadMovementRef = (0, import_react13.useRef)(false);
+  const [isDragging, setIsDragging] = (0, import_react11.useState)(false);
+  const dragStartRef = (0, import_react11.useRef)(null);
+  const hadMovementRef = (0, import_react11.useRef)(false);
   const { updateProperty } = usePropertyUpdate(app);
+  const step = timelineStep || "day";
   const ROW_HEIGHT = 40;
-  const getPixelsPerDay = (0, import_react13.useCallback)(() => {
+  const getPixelsPerUnit = (0, import_react11.useCallback)(() => {
     var _a;
-    const totalDays = differenceInDays(timelineEnd, timelineStart) + 1;
+    const totalUnits = getTimelineUnitCount(timelineStart, timelineEnd, step);
     const chartWidth = ((_a = chartRef.current) == null ? void 0 : _a.getBoundingClientRect().width) || 1e3;
-    return chartWidth / totalDays;
-  }, [timelineStart, timelineEnd, chartRef]);
-  const consumeHadMovement = (0, import_react13.useCallback)(() => {
+    return chartWidth / totalUnits;
+  }, [timelineStart, timelineEnd, chartRef, step]);
+  const consumeHadMovement = (0, import_react11.useCallback)(() => {
     const had = hadMovementRef.current;
     hadMovementRef.current = false;
     return had;
   }, []);
-  const handleDragStart = (0, import_react13.useCallback)(
+  const handleDragStart = (0, import_react11.useCallback)(
     (e) => {
       if (e.button !== 0)
         return;
@@ -19111,7 +19325,7 @@ function useTaskDrag({
       const originalStartDate = task.startDate;
       const originalEndDate = task.endDate;
       const originalGroup = task.group;
-      const pixelsPerDay = getPixelsPerDay();
+      const pixelsPerUnit = getPixelsPerUnit();
       const handleMouseMove = (moveEvent) => {
         if (!dragStartRef.current)
           return;
@@ -19120,10 +19334,10 @@ function useTaskDrag({
         if (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3) {
           hadMovementRef.current = true;
         }
-        const newStartDate = calculateDateFromDelta(originalStartDate, deltaX, pixelsPerDay);
-        const newEndDate = calculateDateFromDelta(originalEndDate, deltaX, pixelsPerDay);
-        updateProperty(task.file, task.startDateProperty, newStartDate.toISOString());
-        updateProperty(task.file, task.endDateProperty, newEndDate.toISOString());
+        const newStartDate = calculateDateFromDelta(originalStartDate, deltaX, pixelsPerUnit, step);
+        const newEndDate = calculateDateFromDelta(originalEndDate, deltaX, pixelsPerUnit, step);
+        void updateProperty(task.file, task.startDateProperty, newStartDate.toISOString());
+        void updateProperty(task.file, task.endDateProperty, newEndDate.toISOString());
       };
       const handleMouseUp = (upEvent) => {
         if (groups.length > 0 && groupByProperty && chartRef.current) {
@@ -19132,18 +19346,19 @@ function useTaskDrag({
           const newGroup = findGroupAtPosition(relativeY, groups, ROW_HEIGHT);
           if (newGroup && newGroup !== originalGroup) {
             const groupValue = newGroup === "No Group" ? "" : newGroup;
-            updateProperty(task.file, groupByProperty, groupValue);
+            void updateProperty(task.file, groupByProperty, groupValue);
           }
         }
         setIsDragging(false);
         dragStartRef.current = null;
         document.removeEventListener("mousemove", handleMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
+        onDragEnd == null ? void 0 : onDragEnd();
       };
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     },
-    [task, updateProperty, getPixelsPerDay, groups, groupByProperty, chartRef]
+    [task, updateProperty, getPixelsPerUnit, step, groups, groupByProperty, chartRef, onDragEnd]
   );
   return {
     isDragging,
@@ -19161,7 +19376,9 @@ var TaskBar = ({
   hoverParent,
   groups,
   groupByProperty,
-  chartRef
+  chartRef,
+  onInteractionEnd,
+  timelineStep
 }) => {
   const [isEditing, setIsEditing] = React16.useState(false);
   const [editValue, setEditValue] = React16.useState(task.title);
@@ -19175,7 +19392,9 @@ var TaskBar = ({
     app,
     timelineStart,
     timelineEnd,
-    chartRef
+    chartRef,
+    onResizeEnd: onInteractionEnd,
+    timelineStep
   });
   const { isDragging, handleDragStart, consumeHadMovement: consumeDragMovement } = useTaskDrag({
     task,
@@ -19184,7 +19403,9 @@ var TaskBar = ({
     timelineEnd,
     groups,
     groupByProperty,
-    chartRef
+    chartRef,
+    onDragEnd: onInteractionEnd,
+    timelineStep
   });
   const { handleMouseEnter, handleMouseLeave } = useHoverPreview(
     app,
@@ -19493,7 +19714,16 @@ var GanttView = ({
     }
   }, [groups, groupByProperty, updateProperty]);
   const chartRef = React19.useRef(null);
+  const interactionCooldownRef = React19.useRef(false);
+  const handleInteractionEnd = React19.useCallback(() => {
+    interactionCooldownRef.current = true;
+    setTimeout(() => {
+      interactionCooldownRef.current = false;
+    }, 100);
+  }, []);
   const handleChartClick = React19.useCallback((e) => {
+    if (interactionCooldownRef.current)
+      return;
     const target = e.target;
     if (target.closest(".bv-gantt-task-bar") || target.closest(".bv-gantt-group-header"))
       return;
@@ -19540,7 +19770,7 @@ ${endDateProperty}: ${endStr}
       groups,
       onToggleGroup: handleToggleGroupCollapse
     }
-  ), /* @__PURE__ */ React19.createElement("div", { className: "bv-gantt-chart-wrapper" }, /* @__PURE__ */ React19.createElement(Timeline, { start: timelineStart, end: timelineEnd }), /* @__PURE__ */ React19.createElement(
+  ), /* @__PURE__ */ React19.createElement("div", { className: "bv-gantt-chart-wrapper" }, /* @__PURE__ */ React19.createElement(Timeline, { start: timelineStart, end: timelineEnd, step: options.timelineStep }), /* @__PURE__ */ React19.createElement(
     "div",
     {
       ref: chartRef,
@@ -19548,7 +19778,7 @@ ${endDateProperty}: ${endStr}
       style: { height: `${chartHeight}px`, cursor: "pointer" },
       onClick: handleChartClick
     },
-    /* @__PURE__ */ React19.createElement(Grid, { start: timelineStart, end: timelineEnd, rowCount: maxRow + 1 }),
+    /* @__PURE__ */ React19.createElement(Grid, { start: timelineStart, end: timelineEnd, rowCount: maxRow + 1, step: options.timelineStep }),
     groups.map((group) => /* @__PURE__ */ React19.createElement(
       GanttGroupHeader,
       {
@@ -19570,7 +19800,9 @@ ${endDateProperty}: ${endStr}
         hoverParent,
         groups,
         groupByProperty,
-        chartRef
+        chartRef,
+        onInteractionEnd: handleInteractionEnd,
+        timelineStep: options.timelineStep
       }
     )),
     tasks.length === 0 && groups.length === 0 && /* @__PURE__ */ React19.createElement("div", { className: "bv-gantt-empty-overlay" }, /* @__PURE__ */ React19.createElement("div", { className: "bv-gantt-empty-message" }, /* @__PURE__ */ React19.createElement("p", null, "No tasks with valid dates found"), /* @__PURE__ */ React19.createElement("p", { className: "bv-gantt-empty-hint" }, "Click on the chart to create your first task, or add", " ", /* @__PURE__ */ React19.createElement("code", null, startDateProperty), " and ", /* @__PURE__ */ React19.createElement("code", null, endDateProperty), " ", "properties to existing notes.")))
@@ -19581,10 +19813,8 @@ ${endDateProperty}: ${endStr}
 var GanttViewType = "bases-gantt";
 var GanttBasesView = class extends ReactBasesView {
   constructor(controller, containerEl) {
-    console.log("GanttBasesView constructor called");
     super(controller, containerEl);
     this.type = GanttViewType;
-    console.log("GanttBasesView constructor completed");
   }
   /**
    * Extract property name from BasesPropertyId (format: "type.propertyName")
@@ -19603,6 +19833,7 @@ var GanttBasesView = class extends ReactBasesView {
     const endDateProperty = this.extractPropertyName(this.config.get("endDateProperty")) || "end";
     const groupByProperty = this.extractPropertyName(this.config.get("groupByProperty")) || "";
     const collapsedGroups = this.config.get("collapsedGroups") || [];
+    const timelineStep = this.config.get("timelineStep") || "day";
     return React20.createElement(
       ErrorBoundary,
       {},
@@ -19612,7 +19843,8 @@ var GanttBasesView = class extends ReactBasesView {
           startDateProperty,
           endDateProperty,
           groupByProperty,
-          collapsedGroups
+          collapsedGroups,
+          timelineStep
         },
         onCollapsedGroupsChange: (groups) => {
           this.config.set("collapsedGroups", groups);
@@ -19647,6 +19879,17 @@ var GanttBasesView = class extends ReactBasesView {
         type: "property",
         default: "",
         placeholder: "Select property (optional)"
+      },
+      {
+        key: "timelineStep",
+        displayName: "Timeline Step",
+        type: "dropdown",
+        default: "day",
+        options: {
+          day: "Day",
+          week: "Week",
+          month: "Month"
+        }
       }
     ];
   }
@@ -19659,19 +19902,19 @@ var React30 = __toESM(require_react());
 var React29 = __toESM(require_react());
 
 // src/views/calendar/hooks/useCalendarData.ts
-var import_react14 = __toESM(require_react());
+var import_react12 = __toESM(require_react());
 
 // src/views/calendar/utils/calendarHelpers.ts
 function generateMonthDays(currentDate) {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
-  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
-  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
+  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
   return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 }
 function generateWeekDays(currentDate) {
-  const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
-  const weekEnd = endOfWeek(currentDate, { weekStartsOn: 0 });
+  const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
+  const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
   return eachDayOfInterval({ start: weekStart, end: weekEnd });
 }
 function entriesToEvents(entries, dateProperty, endDateProperty) {
@@ -19804,14 +20047,14 @@ function isDayToday(day) {
 
 // src/views/calendar/hooks/useCalendarData.ts
 function useCalendarData(data, app, initialDateProperty, initialEndDateProperty, initialViewMode) {
-  const [dateProperty, setDateProperty] = (0, import_react14.useState)(initialDateProperty || "start");
-  const [endDateProperty, setEndDateProperty] = (0, import_react14.useState)(initialEndDateProperty || "end");
-  const [viewMode, setViewMode] = (0, import_react14.useState)(initialViewMode || "month");
-  const [currentDate, setCurrentDate] = (0, import_react14.useState)(/* @__PURE__ */ new Date());
-  const entries = (0, import_react14.useMemo)(() => {
+  const [dateProperty, setDateProperty] = (0, import_react12.useState)(initialDateProperty || "start");
+  const [endDateProperty, setEndDateProperty] = (0, import_react12.useState)(initialEndDateProperty || "end");
+  const [viewMode, setViewMode] = (0, import_react12.useState)(initialViewMode || "month");
+  const [currentDate, setCurrentDate] = (0, import_react12.useState)(/* @__PURE__ */ new Date());
+  const entries = (0, import_react12.useMemo)(() => {
     return adaptBasesData(data, app);
   }, [data, app]);
-  const events2 = (0, import_react14.useMemo)(() => {
+  const events2 = (0, import_react12.useMemo)(() => {
     return entriesToEvents(entries, dateProperty, endDateProperty || void 0);
   }, [entries, dateProperty, endDateProperty]);
   return {
@@ -19828,7 +20071,7 @@ function useCalendarData(data, app, initialDateProperty, initialEndDateProperty,
 }
 
 // src/views/calendar/hooks/useEventDrag.ts
-var import_react15 = __toESM(require_react());
+var import_react13 = __toESM(require_react());
 
 // src/views/calendar/utils/dateUtils.ts
 function formatDateString(date) {
@@ -19881,7 +20124,7 @@ function formatFullDate(date) {
 // src/views/calendar/hooks/useEventDrag.ts
 function useEventDrag(events2, dateProperty, app) {
   const { updateProperty } = usePropertyUpdate(app);
-  const handleDragEnd = (0, import_react15.useCallback)(
+  const handleDragEnd = (0, import_react13.useCallback)(
     (event) => {
       const { active, over } = event;
       if (!over)
@@ -19891,14 +20134,9 @@ function useEventDrag(events2, dateProperty, app) {
       if (!calendarEvent)
         return;
       const newDateString = over.id;
-      try {
-        const newDate = parseISO(newDateString);
-        const oldDateString = formatDateString(calendarEvent.date);
-        if (oldDateString !== newDateString) {
-          updateProperty(calendarEvent.file, dateProperty, newDateString);
-        }
-      } catch (error) {
-        console.error("Failed to parse new date:", error);
+      const oldDateString = formatDateString(calendarEvent.date);
+      if (oldDateString !== newDateString) {
+        void updateProperty(calendarEvent.file, dateProperty, newDateString);
       }
     },
     [events2, dateProperty, updateProperty]
@@ -19917,24 +20155,24 @@ var React22 = __toESM(require_react());
 var import_react_dom2 = __toESM(require_react_dom());
 
 // src/views/calendar/hooks/useMultiDayEventDrag.ts
-var import_react17 = __toESM(require_react());
+var import_react15 = __toESM(require_react());
 
 // src/views/calendar/context/CalendarDragContext.tsx
 var React21 = __toESM(require_react());
-var import_react16 = __toESM(require_react());
-var CalendarDragContext = (0, import_react16.createContext)(null);
+var import_react14 = __toESM(require_react());
+var CalendarDragContext = (0, import_react14.createContext)(null);
 var CalendarDragProvider = ({ children }) => {
-  const [highlightedDates, setHighlightedDatesState] = (0, import_react16.useState)([]);
-  const setHighlightedDates = (0, import_react16.useCallback)((dates) => {
+  const [highlightedDates, setHighlightedDatesState] = (0, import_react14.useState)([]);
+  const setHighlightedDates = (0, import_react14.useCallback)((dates) => {
     setHighlightedDatesState(dates);
   }, []);
-  const clearHighlights = (0, import_react16.useCallback)(() => {
+  const clearHighlights = (0, import_react14.useCallback)(() => {
     setHighlightedDatesState([]);
   }, []);
   return /* @__PURE__ */ React21.createElement(CalendarDragContext.Provider, { value: { highlightedDates, setHighlightedDates, clearHighlights } }, children);
 };
 function useCalendarDrag() {
-  const context = (0, import_react16.useContext)(CalendarDragContext);
+  const context = (0, import_react14.useContext)(CalendarDragContext);
   if (!context) {
     return {
       highlightedDates: [],
@@ -19956,24 +20194,29 @@ function useMultiDayEventDrag({
   endDateProperty,
   onDragEnd
 }) {
-  const [isDragging, setIsDragging] = (0, import_react17.useState)(false);
-  const [previewDelta, setPreviewDelta] = (0, import_react17.useState)(0);
-  const [cursorPosition, setCursorPosition] = (0, import_react17.useState)(null);
-  const dragStartRef = (0, import_react17.useRef)(null);
-  const hadMovementRef = (0, import_react17.useRef)(false);
+  const [isDragging, setIsDragging] = (0, import_react15.useState)(false);
+  const [previewDelta, setPreviewDelta] = (0, import_react15.useState)(0);
+  const [cursorPosition, setCursorPosition] = (0, import_react15.useState)(null);
+  const dragStartRef = (0, import_react15.useRef)(null);
+  const hadMovementRef = (0, import_react15.useRef)(false);
   const { updateProperty } = usePropertyUpdate(app);
   const { setHighlightedDates, clearHighlights } = useCalendarDrag();
-  const getDayWidth = (0, import_react17.useCallback)(() => {
+  const getDayWidth = (0, import_react15.useCallback)(() => {
     if (!containerRef.current)
       return 100;
     return containerRef.current.getBoundingClientRect().width / 7;
   }, [containerRef]);
-  const consumeHadMovement = (0, import_react17.useCallback)(() => {
+  const getRowHeight = (0, import_react15.useCallback)(() => {
+    if (!containerRef.current)
+      return 100;
+    return containerRef.current.getBoundingClientRect().height;
+  }, [containerRef]);
+  const consumeHadMovement = (0, import_react15.useCallback)(() => {
     const had = hadMovementRef.current;
     hadMovementRef.current = false;
     return had;
   }, []);
-  const handleDragStart = (0, import_react17.useCallback)(
+  const handleDragStart = (0, import_react15.useCallback)(
     (e) => {
       if (e.button !== 0)
         return;
@@ -19985,17 +20228,22 @@ function useMultiDayEventDrag({
       const endDate = event.endDate || event.date;
       dragStartRef.current = {
         x: e.clientX,
+        y: e.clientY,
         startDate,
         endDate
       };
       const dayWidth = getDayWidth();
+      const rowHeight = getRowHeight();
       let currentDeltaDays = 0;
       const handleMouseMove = (moveEvent) => {
         if (!dragStartRef.current)
           return;
         const deltaX = moveEvent.clientX - dragStartRef.current.x;
-        currentDeltaDays = Math.round(deltaX / dayWidth);
-        if (Math.abs(deltaX) > 5) {
+        const deltaY = moveEvent.clientY - dragStartRef.current.y;
+        const colDelta = Math.round(deltaX / dayWidth);
+        const rowDelta = Math.round(deltaY / rowHeight);
+        currentDeltaDays = colDelta + rowDelta * 7;
+        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
           hadMovementRef.current = true;
         }
         setPreviewDelta(currentDeltaDays);
@@ -20009,8 +20257,8 @@ function useMultiDayEventDrag({
         if (dragStartRef.current && currentDeltaDays !== 0) {
           const newStartDate = addDays(dragStartRef.current.startDate, currentDeltaDays);
           const newEndDate = addDays(dragStartRef.current.endDate, currentDeltaDays);
-          updateProperty(event.file, dateProperty, formatDateString(newStartDate));
-          updateProperty(event.file, endDateProperty, formatDateString(newEndDate));
+          void updateProperty(event.file, dateProperty, formatDateString(newStartDate));
+          void updateProperty(event.file, endDateProperty, formatDateString(newEndDate));
         }
         setIsDragging(false);
         setPreviewDelta(0);
@@ -20036,7 +20284,7 @@ function useMultiDayEventDrag({
 }
 
 // src/views/calendar/hooks/useEventResize.ts
-var import_react18 = __toESM(require_react());
+var import_react16 = __toESM(require_react());
 function useEventResize({
   event,
   app,
@@ -20045,22 +20293,28 @@ function useEventResize({
   endDateProperty,
   onResizeEnd
 }) {
-  const [isResizing, setIsResizing] = (0, import_react18.useState)(false);
-  const [previewDelta, setPreviewDelta] = (0, import_react18.useState)(null);
-  const resizeTypeRef = (0, import_react18.useRef)(null);
-  const hadMovementRef = (0, import_react18.useRef)(false);
+  const [isResizing, setIsResizing] = (0, import_react16.useState)(false);
+  const [previewDelta, setPreviewDelta] = (0, import_react16.useState)(null);
+  const resizeTypeRef = (0, import_react16.useRef)(null);
+  const hadMovementRef = (0, import_react16.useRef)(false);
   const { updateProperty } = usePropertyUpdate(app);
-  const getDayWidth = (0, import_react18.useCallback)(() => {
+  const { setHighlightedDates, clearHighlights } = useCalendarDrag();
+  const getDayWidth = (0, import_react16.useCallback)(() => {
     if (!containerRef.current)
       return 100;
     return containerRef.current.getBoundingClientRect().width / 7;
   }, [containerRef]);
-  const consumeHadMovement = (0, import_react18.useCallback)(() => {
+  const getRowHeight = (0, import_react16.useCallback)(() => {
+    if (!containerRef.current)
+      return 100;
+    return containerRef.current.getBoundingClientRect().height;
+  }, [containerRef]);
+  const consumeHadMovement = (0, import_react16.useCallback)(() => {
     const had = hadMovementRef.current;
     hadMovementRef.current = false;
     return had;
   }, []);
-  const handleResizeStart = (0, import_react18.useCallback)(
+  const handleResizeStart = (0, import_react16.useCallback)(
     (e, handle) => {
       e.preventDefault();
       e.stopPropagation();
@@ -20068,31 +20322,54 @@ function useEventResize({
       hadMovementRef.current = false;
       resizeTypeRef.current = handle;
       const startX = e.clientX;
+      const startY = e.clientY;
       const originalStartDate = event.date;
       const originalEndDate = event.endDate || event.date;
       const dayWidth = getDayWidth();
+      const rowHeight = getRowHeight();
       let currentDeltaDays = 0;
       const handleMouseMove = (moveEvent) => {
         const deltaX = moveEvent.clientX - startX;
-        currentDeltaDays = Math.round(deltaX / dayWidth);
-        if (Math.abs(deltaX) > 5) {
+        const deltaY = moveEvent.clientY - startY;
+        const colDelta = Math.round(deltaX / dayWidth);
+        const rowDelta = Math.round(deltaY / rowHeight);
+        currentDeltaDays = colDelta + rowDelta * 7;
+        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
           hadMovementRef.current = true;
         }
         setPreviewDelta({ type: handle, days: currentDeltaDays });
+        let newStartDate;
+        let newEndDate;
+        if (handle === "start") {
+          newStartDate = addDays(originalStartDate, currentDeltaDays);
+          newEndDate = originalEndDate;
+          if (newStartDate > newEndDate) {
+            newStartDate = newEndDate;
+          }
+        } else {
+          newStartDate = originalStartDate;
+          newEndDate = addDays(originalEndDate, currentDeltaDays);
+          if (newEndDate < newStartDate) {
+            newEndDate = newStartDate;
+          }
+        }
+        const datesInRange = eachDayOfInterval({ start: newStartDate, end: newEndDate });
+        setHighlightedDates(datesInRange.map((d) => formatDateString(d)));
       };
       const handleMouseUp = () => {
         document.removeEventListener("mousemove", handleMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
+        clearHighlights();
         if (currentDeltaDays !== 0) {
           if (handle === "start") {
             const newStartDate = addDays(originalStartDate, currentDeltaDays);
             if (newStartDate <= originalEndDate) {
-              updateProperty(event.file, dateProperty, formatDateString(newStartDate));
+              void updateProperty(event.file, dateProperty, formatDateString(newStartDate));
             }
           } else {
             const newEndDate = addDays(originalEndDate, currentDeltaDays);
             if (newEndDate >= originalStartDate) {
-              updateProperty(event.file, endDateProperty, formatDateString(newEndDate));
+              void updateProperty(event.file, endDateProperty, formatDateString(newEndDate));
             }
           }
         }
@@ -20106,7 +20383,7 @@ function useEventResize({
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     },
-    [event, updateProperty, getDayWidth, dateProperty, endDateProperty, onResizeEnd]
+    [event, updateProperty, getDayWidth, getRowHeight, dateProperty, endDateProperty, onResizeEnd, setHighlightedDates, clearHighlights]
   );
   return {
     isResizing,
@@ -20133,7 +20410,7 @@ var Event = ({
     dateProperty,
     endDateProperty
   });
-  const { isResizing, previewDelta: resizeDelta, handleResizeStart, consumeHadMovement: consumeResizeMovement } = useEventResize({
+  const { isResizing, handleResizeStart, consumeHadMovement: consumeResizeMovement } = useEventResize({
     event,
     app,
     containerRef,
@@ -20288,7 +20565,7 @@ var MultiDayEvent = ({
     endDateProperty,
     onDragEnd: onInteractionEnd
   });
-  const { isResizing, previewDelta: resizeDelta, handleResizeStart, consumeHadMovement: consumeResizeMovement } = useEventResize({
+  const { isResizing, handleResizeStart, consumeHadMovement: consumeResizeMovement } = useEventResize({
     event,
     app,
     containerRef,
@@ -20313,6 +20590,17 @@ var MultiDayEvent = ({
     openNote(e);
   }, [consumeDragMovement, consumeResizeMovement, openNote]);
   const isActive = isDragging || isResizing;
+  const [isUpdated, setIsUpdated] = React24.useState(false);
+  const prevPositionRef = React24.useRef({ startCol, colSpan });
+  React24.useEffect(() => {
+    const prev = prevPositionRef.current;
+    if (prev.startCol !== startCol || prev.colSpan !== colSpan) {
+      setIsUpdated(true);
+      const timer = setTimeout(() => setIsUpdated(false), 300);
+      prevPositionRef.current = { startCol, colSpan };
+      return () => clearTimeout(timer);
+    }
+  }, [startCol, colSpan]);
   const style = {
     gridColumn: `${startCol + 1} / span ${colSpan}`,
     gridRow: row + 1,
@@ -20321,7 +20609,7 @@ var MultiDayEvent = ({
   return /* @__PURE__ */ React24.createElement(React24.Fragment, null, /* @__PURE__ */ React24.createElement(
     "div",
     {
-      className: `bv-calendar-multi-day-event ${continuesBefore ? "bv-continues-before" : ""} ${continuesAfter ? "bv-continues-after" : ""} ${isActive ? "bv-event-active" : ""}`,
+      className: `bv-calendar-multi-day-event ${continuesBefore ? "bv-continues-before" : ""} ${continuesAfter ? "bv-continues-after" : ""} ${isActive ? "bv-event-active" : ""} ${isUpdated ? "bv-event-updated" : ""}`,
       style,
       onClick: handleClick,
       onMouseEnter: handleMouseEnter,
@@ -20373,7 +20661,7 @@ var MultiDayEvent = ({
 };
 
 // src/views/calendar/components/MonthView.tsx
-var WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+var WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 var MonthView = ({
   currentDate,
   events: events2,
@@ -20487,7 +20775,7 @@ var MonthView = ({
 };
 
 // src/views/calendar/components/WeekView.tsx
-var import_react19 = __toESM(require_react());
+var import_react17 = __toESM(require_react());
 var WeekView = ({
   currentDate,
   events: events2,
@@ -20498,11 +20786,11 @@ var WeekView = ({
   onCreateEvent
 }) => {
   const days = generateWeekDays(currentDate);
-  const containerRef = import_react19.default.useRef(null);
-  const [dragOverDate, setDragOverDate] = import_react19.default.useState(null);
+  const containerRef = import_react17.default.useRef(null);
+  const [dragOverDate, setDragOverDate] = import_react17.default.useState(null);
   const { highlightedDates } = useCalendarDrag();
-  const [sortVersion, setSortVersion] = import_react19.default.useState(0);
-  const handleInteractionEnd = import_react19.default.useCallback(() => {
+  const [sortVersion, setSortVersion] = import_react17.default.useState(0);
+  const handleInteractionEnd = import_react17.default.useCallback(() => {
     setTimeout(() => {
       setSortVersion((v) => v + 1);
     }, 50);
@@ -20520,15 +20808,15 @@ var WeekView = ({
       setDragOverDate(null);
     }
   });
-  const multiDayEvents = import_react19.default.useMemo(() => {
+  const multiDayEvents = import_react17.default.useMemo(() => {
     return getMultiDayEventsForWeek(events2, days);
   }, [events2, days, sortVersion]);
-  return /* @__PURE__ */ import_react19.default.createElement("div", { className: "bv-calendar-week-view", ref: containerRef }, /* @__PURE__ */ import_react19.default.createElement("div", { className: "bv-calendar-weekday-header" }, days.map((day) => /* @__PURE__ */ import_react19.default.createElement("div", { key: day.toISOString(), className: "bv-calendar-weekday" }, formatWeekday(day)))), /* @__PURE__ */ import_react19.default.createElement("div", { className: "bv-calendar-week-row" }, days.map((day, dayIndex) => {
+  return /* @__PURE__ */ import_react17.default.createElement("div", { className: "bv-calendar-week-view", ref: containerRef }, /* @__PURE__ */ import_react17.default.createElement("div", { className: "bv-calendar-weekday-header" }, days.map((day) => /* @__PURE__ */ import_react17.default.createElement("div", { key: day.toISOString(), className: "bv-calendar-weekday" }, formatWeekday(day)))), /* @__PURE__ */ import_react17.default.createElement("div", { className: "bv-calendar-week-row" }, days.map((day, dayIndex) => {
     const dateStr = formatDateString(day);
     const isDragOver = dragOverDate === dateStr || highlightedDates.includes(dateStr);
     if (!isDragOver)
       return null;
-    return /* @__PURE__ */ import_react19.default.createElement(
+    return /* @__PURE__ */ import_react17.default.createElement(
       "div",
       {
         key: `highlight-${dateStr}`,
@@ -20536,10 +20824,10 @@ var WeekView = ({
         style: { left: `${dayIndex / 7 * 100}%`, width: `${100 / 7}%` }
       }
     );
-  }), /* @__PURE__ */ import_react19.default.createElement("div", { className: "bv-calendar-day-numbers-row" }, days.map((day) => {
+  }), /* @__PURE__ */ import_react17.default.createElement("div", { className: "bv-calendar-day-numbers-row" }, days.map((day) => {
     const dateStr = formatDateString(day);
     const isToday2 = day.toDateString() === (/* @__PURE__ */ new Date()).toDateString();
-    return /* @__PURE__ */ import_react19.default.createElement(
+    return /* @__PURE__ */ import_react17.default.createElement(
       "div",
       {
         key: dateStr,
@@ -20547,9 +20835,9 @@ var WeekView = ({
       },
       day.getDate()
     );
-  })), multiDayEvents.length > 0 && /* @__PURE__ */ import_react19.default.createElement("div", { className: "bv-calendar-multi-day-row" }, multiDayEvents.map((event, eventIndex) => {
+  })), multiDayEvents.length > 0 && /* @__PURE__ */ import_react17.default.createElement("div", { className: "bv-calendar-multi-day-row" }, multiDayEvents.map((event, eventIndex) => {
     const span = calculateEventSpanInWeek(event, days);
-    return /* @__PURE__ */ import_react19.default.createElement(
+    return /* @__PURE__ */ import_react17.default.createElement(
       MultiDayEvent,
       {
         key: event.id,
@@ -20567,9 +20855,9 @@ var WeekView = ({
         onInteractionEnd: handleInteractionEnd
       }
     );
-  })), /* @__PURE__ */ import_react19.default.createElement("div", { className: "bv-calendar-days-row" }, days.map((day) => {
+  })), /* @__PURE__ */ import_react17.default.createElement("div", { className: "bv-calendar-days-row" }, days.map((day) => {
     const dayEvents = getEventsForDay(events2, day);
-    return /* @__PURE__ */ import_react19.default.createElement(
+    return /* @__PURE__ */ import_react17.default.createElement(
       DayCell,
       {
         key: formatDateString(day),
@@ -20603,7 +20891,7 @@ var NewEventModal = class extends import_obsidian3.Modal {
   }
   onOpen() {
     const { contentEl } = this;
-    contentEl.createEl("h2", { text: "New Event" });
+    contentEl.createEl("h2", { text: "New event" });
     new import_obsidian3.Setting(contentEl).setName("Event name").addText((text) => {
       text.setPlaceholder("Enter event name").onChange((value) => {
         this.eventName = value;
@@ -20611,7 +20899,7 @@ var NewEventModal = class extends import_obsidian3.Modal {
       setTimeout(() => text.inputEl.focus(), 10);
     });
     new import_obsidian3.Setting(contentEl).setName("Start time").addText(
-      (text) => text.setPlaceholder("HH:mm").setValue(format(this.startTime, "HH:mm")).onChange((value) => {
+      (text) => text.setPlaceholder("09:30").setValue(format(this.startTime, "HH:mm")).onChange((value) => {
         const parsed = parse(value, "HH:mm", this.startTime);
         if (isValid(parsed)) {
           this.startTime = parsed;
@@ -20619,7 +20907,7 @@ var NewEventModal = class extends import_obsidian3.Modal {
       })
     );
     new import_obsidian3.Setting(contentEl).setName("End time").addText(
-      (text) => text.setPlaceholder("HH:mm").setValue(format(this.endTime, "HH:mm")).onChange((value) => {
+      (text) => text.setPlaceholder("09:30").setValue(format(this.endTime, "HH:mm")).onChange((value) => {
         const parsed = parse(value, "HH:mm", this.endTime);
         if (isValid(parsed)) {
           this.endTime = parsed;
@@ -20657,7 +20945,7 @@ var NewEventModal = class extends import_obsidian3.Modal {
 };
 
 // src/views/calendar/hooks/useTimedEventDrag.ts
-var import_react20 = __toESM(require_react());
+var import_react18 = __toESM(require_react());
 var HOUR_HEIGHT = 60;
 var MINUTES_PER_SNAP = 15;
 function useTimedEventDrag({
@@ -20667,25 +20955,25 @@ function useTimedEventDrag({
   dateProperty,
   endDateProperty
 }) {
-  const [isDragging, setIsDragging] = (0, import_react20.useState)(false);
-  const [isResizing, setIsResizing] = (0, import_react20.useState)(false);
-  const [dragDeltaMinutes, setDragDeltaMinutes] = (0, import_react20.useState)(0);
-  const [resizeDelta, setResizeDelta] = (0, import_react20.useState)(null);
-  const hadMovementRef = (0, import_react20.useRef)(false);
+  const [isDragging, setIsDragging] = (0, import_react18.useState)(false);
+  const [isResizing, setIsResizing] = (0, import_react18.useState)(false);
+  const [dragDeltaMinutes, setDragDeltaMinutes] = (0, import_react18.useState)(0);
+  const [resizeDelta, setResizeDelta] = (0, import_react18.useState)(null);
+  const hadMovementRef = (0, import_react18.useRef)(false);
   const { updateProperty } = usePropertyUpdate(app);
-  const pixelsToMinutes = (0, import_react20.useCallback)((pixels) => {
+  const pixelsToMinutes = (0, import_react18.useCallback)((pixels) => {
     const rawMinutes = pixels / HOUR_HEIGHT * 60;
     return Math.round(rawMinutes / MINUTES_PER_SNAP) * MINUTES_PER_SNAP;
   }, []);
-  const formatDateTime = (0, import_react20.useCallback)((date) => {
+  const formatDateTime = (0, import_react18.useCallback)((date) => {
     return format(date, "yyyy-MM-dd'T'HH:mm");
   }, []);
-  const consumeDragMovement = (0, import_react20.useCallback)(() => {
+  const consumeDragMovement = (0, import_react18.useCallback)(() => {
     const had = hadMovementRef.current;
     hadMovementRef.current = false;
     return had;
   }, []);
-  const handleDragStart = (0, import_react20.useCallback)((e) => {
+  const handleDragStart = (0, import_react18.useCallback)((e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(true);
@@ -20709,8 +20997,8 @@ function useTimedEventDrag({
       if (currentDeltaMinutes !== 0) {
         const newStartDate = addMinutes(originalStartDate, currentDeltaMinutes);
         const newEndDate = new Date(newStartDate.getTime() + duration);
-        updateProperty(event.file, dateProperty, formatDateTime(newStartDate));
-        updateProperty(event.file, endDateProperty, formatDateTime(newEndDate));
+        void updateProperty(event.file, dateProperty, formatDateTime(newStartDate));
+        void updateProperty(event.file, endDateProperty, formatDateTime(newEndDate));
       }
       setTimeout(() => {
         setIsDragging(false);
@@ -20720,7 +21008,7 @@ function useTimedEventDrag({
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
   }, [event, updateProperty, dateProperty, endDateProperty, pixelsToMinutes, formatDateTime]);
-  const handleResizeStart = (0, import_react20.useCallback)((e, edge) => {
+  const handleResizeStart = (0, import_react18.useCallback)((e, edge) => {
     e.preventDefault();
     e.stopPropagation();
     setIsResizing(true);
@@ -20744,12 +21032,12 @@ function useTimedEventDrag({
         if (edge === "start") {
           const newStartDate = addMinutes(originalStartDate, currentDeltaMinutes);
           if (newStartDate < originalEndDate) {
-            updateProperty(event.file, dateProperty, formatDateTime(newStartDate));
+            void updateProperty(event.file, dateProperty, formatDateTime(newStartDate));
           }
         } else {
           const newEndDate = addMinutes(originalEndDate, currentDeltaMinutes);
           if (newEndDate > originalStartDate) {
-            updateProperty(event.file, endDateProperty, formatDateTime(newEndDate));
+            void updateProperty(event.file, endDateProperty, formatDateTime(newEndDate));
           }
         }
       }
@@ -21233,23 +21521,23 @@ var TimedEvent = ({
 };
 
 // src/views/calendar/components/ViewSwitcher.tsx
-var import_react21 = __toESM(require_react());
+var import_react19 = __toESM(require_react());
 var ViewSwitcher = ({ value, onChange }) => {
-  return /* @__PURE__ */ import_react21.default.createElement("div", { className: "bv-calendar-view-switcher" }, /* @__PURE__ */ import_react21.default.createElement(
+  return /* @__PURE__ */ import_react19.default.createElement("div", { className: "bv-calendar-view-switcher" }, /* @__PURE__ */ import_react19.default.createElement(
     "button",
     {
       className: `bv-calendar-view-button ${value === "month" ? "bv-calendar-view-button-active" : ""}`,
       onClick: () => onChange("month")
     },
     "Month"
-  ), /* @__PURE__ */ import_react21.default.createElement(
+  ), /* @__PURE__ */ import_react19.default.createElement(
     "button",
     {
       className: `bv-calendar-view-button ${value === "week" ? "bv-calendar-view-button-active" : ""}`,
       onClick: () => onChange("week")
     },
     "Week"
-  ), /* @__PURE__ */ import_react21.default.createElement(
+  ), /* @__PURE__ */ import_react19.default.createElement(
     "button",
     {
       className: `bv-calendar-view-button ${value === "day" ? "bv-calendar-view-button-active" : ""}`,
@@ -21333,7 +21621,7 @@ ${dateProperty}: ${dateStr}
       "Event name"
     ).open();
   }, [app, dateProperty]);
-  const title = viewMode === "month" ? formatMonthYear(currentDate) : viewMode === "week" ? formatWeekRange(startOfWeek(currentDate), endOfWeek(currentDate)) : formatFullDate(currentDate);
+  const title = viewMode === "month" ? formatMonthYear(currentDate) : viewMode === "week" ? formatWeekRange(startOfWeek(currentDate, { weekStartsOn: 1 }), endOfWeek(currentDate, { weekStartsOn: 1 })) : formatFullDate(currentDate);
   return /* @__PURE__ */ React29.createElement(CalendarDragProvider, null, /* @__PURE__ */ React29.createElement("div", { className: "bv-calendar-view" }, /* @__PURE__ */ React29.createElement("div", { className: "bv-calendar-header" }, /* @__PURE__ */ React29.createElement("div", { className: "bv-calendar-controls" }, /* @__PURE__ */ React29.createElement(
     "button",
     {
@@ -21406,10 +21694,8 @@ ${dateProperty}: ${dateStr}
 var CalendarViewType = "bases-calendar";
 var CalendarBasesView = class extends ReactBasesView {
   constructor(controller, containerEl) {
-    console.log("CalendarBasesView constructor called");
     super(controller, containerEl);
     this.type = CalendarViewType;
-    console.log("CalendarBasesView constructor completed");
   }
   /**
    * Extract property name from BasesPropertyId (format: "type.propertyName")
@@ -21482,66 +21768,52 @@ var CalendarBasesView = class extends ReactBasesView {
 
 // src/main.ts
 var BasesCustomViewsPlugin = class extends import_obsidian4.Plugin {
-  async onload() {
-    console.log("Loading Bases Views plugin");
+  onload() {
     if (typeof this.registerBasesView !== "function") {
       console.error(
         "registerBasesView is not available - Obsidian version may be too old (need 1.10.0+)"
       );
       return;
     }
+    const plugin = this;
     try {
-      console.log("Registering Board view...");
-      const boardRegistered = this.registerBasesView(BoardViewType, {
+      plugin.registerBasesView(BoardViewType, {
         name: "Board",
         icon: "lucide-layout-dashboard",
         factory: (controller, containerEl) => {
-          console.log("Board factory called with controller:", controller);
           return new BoardBasesView(controller, containerEl);
         },
         options: BoardBasesView.getViewOptions
       });
-      console.log("\u2713 Board view registration result:", boardRegistered);
     } catch (e) {
-      console.error("\u2717 Failed to register Board view:", e);
+      console.error("Failed to register Board view:", e);
     }
     try {
-      console.log("Registering Gantt view...");
-      const ganttRegistered = this.registerBasesView(GanttViewType, {
+      plugin.registerBasesView(GanttViewType, {
         name: "Gantt",
         icon: "lucide-gantt-chart",
         factory: (controller, containerEl) => {
-          console.log("Gantt factory called with controller:", controller);
           return new GanttBasesView(controller, containerEl);
         },
         options: GanttBasesView.getViewOptions
       });
-      console.log("\u2713 Gantt view registration result:", ganttRegistered);
     } catch (e) {
-      console.error("\u2717 Failed to register Gantt view:", e);
+      console.error("Failed to register Gantt view:", e);
     }
     try {
-      console.log("Registering Calendar view...");
-      const calendarRegistered = this.registerBasesView(
-        CalendarViewType,
-        {
-          name: "Calendar",
-          icon: "lucide-calendar",
-          factory: (controller, containerEl) => {
-            console.log("Calendar factory called with controller:", controller);
-            return new CalendarBasesView(controller, containerEl);
-          },
-          options: CalendarBasesView.getViewOptions
-        }
-      );
-      console.log("\u2713 Calendar view registration result:", calendarRegistered);
+      plugin.registerBasesView(CalendarViewType, {
+        name: "Calendar",
+        icon: "lucide-calendar",
+        factory: (controller, containerEl) => {
+          return new CalendarBasesView(controller, containerEl);
+        },
+        options: CalendarBasesView.getViewOptions
+      });
     } catch (e) {
-      console.error("\u2717 Failed to register Calendar view:", e);
+      console.error("Failed to register Calendar view:", e);
     }
-    console.log("Bases Views plugin loaded successfully");
   }
-  async onunload() {
-    console.log("Unloading Bases Views plugin");
+  onunload() {
     const styleEl = document.getElementById("bases-views-styles");
     if (styleEl) {
       styleEl.remove();
