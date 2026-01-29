@@ -37,7 +37,7 @@ export const Event: React.FC<EventProps> = ({
     endDateProperty,
   });
 
-  const { isResizing, previewDelta: resizeDelta, handleResizeStart, consumeHadMovement: consumeResizeMovement } = useEventResize({
+  const { isResizing, handleResizeStart, consumeHadMovement: consumeResizeMovement } = useEventResize({
     event,
     app,
     containerRef,

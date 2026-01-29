@@ -96,8 +96,8 @@ export function useTimedEventDrag({
         const newEndDate = new Date(newStartDate.getTime() + duration);
 
         // Update both start and end times
-        updateProperty(event.file, dateProperty, formatDateTime(newStartDate));
-        updateProperty(event.file, endDateProperty, formatDateTime(newEndDate));
+        void updateProperty(event.file, dateProperty, formatDateTime(newStartDate));
+        void updateProperty(event.file, endDateProperty, formatDateTime(newEndDate));
       }
 
       // Delay state reset to allow data update to propagate and prevent flicker
@@ -147,13 +147,13 @@ export function useTimedEventDrag({
           const newStartDate = addMinutes(originalStartDate, currentDeltaMinutes);
           // Don't allow start to go past end (minimum 15 minutes)
           if (newStartDate < originalEndDate) {
-            updateProperty(event.file, dateProperty, formatDateTime(newStartDate));
+            void updateProperty(event.file, dateProperty, formatDateTime(newStartDate));
           }
         } else {
           const newEndDate = addMinutes(originalEndDate, currentDeltaMinutes);
           // Don't allow end to go before start (minimum 15 minutes)
           if (newEndDate > originalStartDate) {
-            updateProperty(event.file, endDateProperty, formatDateTime(newEndDate));
+            void updateProperty(event.file, endDateProperty, formatDateTime(newEndDate));
           }
         }
       }

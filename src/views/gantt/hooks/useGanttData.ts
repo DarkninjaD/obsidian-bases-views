@@ -3,7 +3,7 @@ import { App, BasesQueryResult } from 'obsidian';
 import { adaptBasesData } from '../../../utils/basesDataAdapter';
 import { entriesToTasks, calculateTaskRows, groupTasksByProperty, calculateGroupedRows } from '../utils/ganttHelpers';
 import { calculateTimelineRange } from '../utils/dateCalculations';
-import { Task, TaskGroup } from '../../../types/view-config';
+import { TaskGroup } from '../../../types/view-config';
 
 /**
  * Hook for Gantt view data management.

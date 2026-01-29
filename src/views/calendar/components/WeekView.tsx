@@ -26,7 +26,7 @@ interface WeekViewProps {
 
 /**
  * WeekView component displaying a weekly calendar.
- * Shows 7 days (Sunday to Saturday) with events.
+ * Shows 7 days (Monday to Sunday) with events.
  * Multi-day events are displayed at the top of the week.
  */
 export const WeekView: React.FC<WeekViewProps> = ({

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { App, HoverParent } from 'obsidian';
-import { Task, TaskGroup } from '../../../types/view-config';
+import { Task, TaskGroup, GanttTimelineStep } from '../../../types/view-config';
 import { useTaskResize } from '../hooks/useTaskResize';
 import { useTaskDrag } from '../hooks/useTaskDrag';
 import { useHoverPreview } from '../../../hooks/useHoverPreview';
@@ -16,6 +16,8 @@ interface TaskBarProps {
   groups: TaskGroup[];
   groupByProperty: string;
   chartRef: React.RefObject<HTMLDivElement>;
+  onInteractionEnd?: () => void;
+  timelineStep?: GanttTimelineStep;
 }
 
 /**
@@ -32,6 +34,8 @@ export const TaskBar: React.FC<TaskBarProps> = ({
   groups,
   groupByProperty,
   chartRef,
+  onInteractionEnd,
+  timelineStep,
 }) => {
   // Inline editing state
   const [isEditing, setIsEditing] = React.useState(false);
@@ -50,6 +54,8 @@ export const TaskBar: React.FC<TaskBarProps> = ({
     timelineStart,
     timelineEnd,
     chartRef,
+    onResizeEnd: onInteractionEnd,
+    timelineStep,
   });
   const { isDragging, handleDragStart, consumeHadMovement: consumeDragMovement } = useTaskDrag({
     task,
@@ -59,6 +65,8 @@ export const TaskBar: React.FC<TaskBarProps> = ({
     groups,
     groupByProperty,
     chartRef,
+    onDragEnd: onInteractionEnd,
+    timelineStep,
   });
 
   const { handleMouseEnter, handleMouseLeave } = useHoverPreview(

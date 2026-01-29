@@ -58,7 +58,7 @@ export function entriesToTasks(
  * @param value - Value to parse
  * @returns Date object or null
  */
-function parseDate(value: any): Date | null {
+function parseDate(value: unknown): Date | null {
   if (!value) return null;
 
   // Already a Date object

@@ -1,4 +1,5 @@
-import { startOfMonth, endOfMonth, eachDayOfInterval, differenceInDays, addDays, format } from 'date-fns';
+import { startOfMonth, endOfMonth, eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, differenceInDays, differenceInWeeks, differenceInMonths, addDays, addWeeks, addMonths, format } from 'date-fns';
+import { GanttTimelineStep } from '../../../types/view-config';
 import { Task } from '../../../types/view-config';
 
 /**
@@ -53,18 +54,38 @@ export function calculateTaskPosition(
 }
 
 /**
- * Generate timeline day markers for the header.
+ * Generate timeline markers for the header based on step.
  *
  * @param timelineStart - Timeline start date
  * @param timelineEnd - Timeline end date
- * @returns Array of day marker objects
+ * @param step - Timeline step (day, week, month)
+ * @returns Array of marker objects
  */
 export function generateTimelineMarkers(
   timelineStart: Date,
-  timelineEnd: Date
+  timelineEnd: Date,
+  step: GanttTimelineStep = 'day'
 ): Array<{ date: Date; label: string; isMonthStart: boolean }> {
-  const days = eachDayOfInterval({ start: timelineStart, end: timelineEnd });
+  if (step === 'week') {
+    const weeks = eachWeekOfInterval({ start: timelineStart, end: timelineEnd }, { weekStartsOn: 1 });
+    return weeks.map((date) => ({
+      date,
+      label: format(date, 'd MMM'),
+      isMonthStart: date.getDate() <= 7,
+    }));
+  }
 
+  if (step === 'month') {
+    const months = eachMonthOfInterval({ start: timelineStart, end: timelineEnd });
+    return months.map((date) => ({
+      date,
+      label: format(date, 'MMM yyyy'),
+      isMonthStart: true,
+    }));
+  }
+
+  // Default: day
+  const days = eachDayOfInterval({ start: timelineStart, end: timelineEnd });
   return days.map((date) => ({
     date,
     label: format(date, 'd'),
@@ -73,18 +94,49 @@ export function generateTimelineMarkers(
 }
 
 /**
- * Calculate new date from pixel delta during resize.
+ * Get the number of timeline units between two dates.
+ *
+ * @param timelineStart - Timeline start date
+ * @param timelineEnd - Timeline end date
+ * @param step - Timeline step
+ * @returns Number of units (inclusive)
+ */
+export function getTimelineUnitCount(
+  timelineStart: Date,
+  timelineEnd: Date,
+  step: GanttTimelineStep = 'day'
+): number {
+  if (step === 'week') {
+    return differenceInWeeks(timelineEnd, timelineStart) + 1;
+  }
+  if (step === 'month') {
+    return differenceInMonths(timelineEnd, timelineStart) + 1;
+  }
+  return differenceInDays(timelineEnd, timelineStart) + 1;
+}
+
+/**
+ * Calculate new date from pixel delta during resize/drag.
  *
  * @param originalDate - Original date before resize
  * @param pixelDelta - Pixel movement
- * @param pixelsPerDay - Pixels representing one day
+ * @param pixelsPerUnit - Pixels representing one unit (day/week/month)
+ * @param step - Timeline step
  * @returns New date
  */
 export function calculateDateFromDelta(
   originalDate: Date,
   pixelDelta: number,
-  pixelsPerDay: number
+  pixelsPerUnit: number,
+  step: GanttTimelineStep = 'day'
 ): Date {
-  const daysDelta = Math.round(pixelDelta / pixelsPerDay);
-  return addDays(originalDate, daysDelta);
+  const unitsDelta = Math.round(pixelDelta / pixelsPerUnit);
+
+  if (step === 'week') {
+    return addWeeks(originalDate, unitsDelta);
+  }
+  if (step === 'month') {
+    return addMonths(originalDate, unitsDelta);
+  }
+  return addDays(originalDate, unitsDelta);
 }

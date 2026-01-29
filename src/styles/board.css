@@ -166,8 +166,15 @@
 }
 
 .bv-section-new-group {
-  @apply flex items-center flex-shrink-0;
+  @apply flex items-start flex-shrink-0;
   min-width: 8rem;
+  padding-top: 0.5rem;
+}
+
+/* New Sub-group button - Notion-style */
+.bv-board-new-subgroup {
+  @apply flex items-center py-2 px-3;
+  border-top: 1px solid var(--background-modifier-border);
 }
 
 /* Row Header - Notion-style collapsible section header */

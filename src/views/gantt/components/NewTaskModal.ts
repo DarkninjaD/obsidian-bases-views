@@ -25,7 +25,7 @@ export class NewTaskModal extends Modal {
   onOpen() {
     const { contentEl } = this;
 
-    contentEl.createEl('h2', { text: 'New Task' });
+    contentEl.createEl('h2', { text: 'New task' });
 
     // Task name input
     new Setting(contentEl)
@@ -43,7 +43,7 @@ export class NewTaskModal extends Modal {
       .setName('Start date')
       .addText((text) =>
         text
-          .setPlaceholder('YYYY-MM-DD')
+          .setPlaceholder('2024-01-15')
           .setValue(format(this.startDate, 'yyyy-MM-dd'))
           .onChange((value) => {
             const parsed = parse(value, 'yyyy-MM-dd', new Date());
@@ -58,7 +58,7 @@ export class NewTaskModal extends Modal {
       .setName('End date')
       .addText((text) =>
         text
-          .setPlaceholder('YYYY-MM-DD')
+          .setPlaceholder('2024-01-15')
           .setValue(format(this.endDate, 'yyyy-MM-dd'))
           .onChange((value) => {
             const parsed = parse(value, 'yyyy-MM-dd', new Date());

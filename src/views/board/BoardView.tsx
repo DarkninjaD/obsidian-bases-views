@@ -168,7 +168,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
 
     // Update group property if changed
     if (String(currentGroupValue) !== newGroupValue) {
-      updateProperty(entry.file, groupByProperty, newGroupValue);
+      void updateProperty(entry.file, groupByProperty, newGroupValue);
     }
 
     // Update sub-group property if changed
@@ -177,7 +177,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
       newSubGroupValue &&
       String(currentSubGroupValue) !== newSubGroupValue
     ) {
-      updateProperty(entry.file, subGroupByProperty, newSubGroupValue);
+      void updateProperty(entry.file, subGroupByProperty, newSubGroupValue);
     }
   };
 
@@ -231,6 +231,36 @@ export const BoardView: React.FC<BoardViewProps> = ({
     modal.open();
   }, [app, groupByProperty]);
 
+  /**
+   * Create a new sub-group (row) by prompting for name
+   */
+  const handleNewSubGroup = React.useCallback(() => {
+    if (!subGroupByProperty) return;
+
+    const modal = new TextInputModal(
+      app,
+      'New Sub-group',
+      async (name) => {
+        if (!name) return;
+
+        // Create a new note with this sub-group value to make the row appear
+        const timestamp = Date.now();
+        const fileName = `${name} ${timestamp}.md`;
+        // Include both group and sub-group properties
+        const firstGroupValue = orderedGroups[0]?.[0] || 'Uncategorized';
+        const frontmatter = `---\n${groupByProperty}: "${firstGroupValue}"\n${subGroupByProperty}: "${name}"\n---\n\n`;
+
+        try {
+          await app.vault.create(fileName, frontmatter);
+        } catch (error) {
+          console.error('Failed to create new sub-group:', error);
+        }
+      },
+      'Enter sub-group name'
+    );
+    modal.open();
+  }, [app, groupByProperty, subGroupByProperty, orderedGroups]);
+
   // Properties to exclude from card tags (grouping properties)
   const excludeProperties = [groupByProperty, subGroupByProperty].filter(Boolean) as string[];
 
@@ -245,7 +275,12 @@ export const BoardView: React.FC<BoardViewProps> = ({
         allSubGroupKeys.add(subGroupKey);
       });
     });
-    const subGroupKeys = Array.from(allSubGroupKeys).sort();
+    const subGroupKeys = Array.from(allSubGroupKeys).sort((a, b) => {
+      // Uncategorized always first
+      if (a === 'Uncategorized') return -1;
+      if (b === 'Uncategorized') return 1;
+      return a.localeCompare(b);
+    });
 
     return (
       <div className="bv-board-view bv-board-notion">
@@ -274,11 +309,6 @@ export const BoardView: React.FC<BoardViewProps> = ({
                 );
               })}
             </SortableContext>
-            <div className="bv-board-header-new-group">
-              <button className="bv-new-group-btn" onClick={handleNewGroup}>
-                + New group
-              </button>
-            </div>
           </div>
 
           <div className="bv-board-sections">
@@ -326,11 +356,24 @@ export const BoardView: React.FC<BoardViewProps> = ({
                           />
                         );
                       })}
+                      {/* New group button in grid */}
+                      <div className="bv-section-new-group">
+                        <button className="bv-new-group-btn" onClick={handleNewGroup}>
+                          + New group
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
               );
             })}
+
+            {/* New sub-group button */}
+            <div className="bv-board-new-subgroup">
+              <button className="bv-new-group-btn" onClick={handleNewSubGroup}>
+                + New sub-group
+              </button>
+            </div>
           </div>
 
           <DragOverlay dropAnimation={null}>

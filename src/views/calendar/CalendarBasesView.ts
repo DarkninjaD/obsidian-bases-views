@@ -14,9 +14,7 @@ export class CalendarBasesView extends ReactBasesView {
   type = CalendarViewType;
 
   constructor(controller: QueryController, containerEl: HTMLElement) {
-    console.log('CalendarBasesView constructor called');
     super(controller, containerEl);
-    console.log('CalendarBasesView constructor completed');
   }
 
   /**

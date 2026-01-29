@@ -6,7 +6,7 @@ import { TFile } from 'obsidian';
 export interface BasesEntry {
   id: string;
   file: TFile;
-  properties: Record<string, any>;
+  properties: Record<string, unknown>;
 }
 
 /**
@@ -21,6 +21,11 @@ export interface BoardViewOptions {
 }
 
 /**
+ * Timeline step/granularity for Gantt view
+ */
+export type GanttTimelineStep = 'day' | 'week' | 'month';
+
+/**
  * Configuration options for Gantt view
  */
 export interface GanttViewOptions {
@@ -28,6 +33,7 @@ export interface GanttViewOptions {
   endDateProperty: string;
   groupByProperty?: string;
   collapsedGroups?: string[]; // Persisted collapsed group names
+  timelineStep?: GanttTimelineStep; // Timeline granularity (default: 'day')
 }
 
 /**

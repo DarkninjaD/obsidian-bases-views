@@ -27,11 +27,11 @@ export function generateMonthDays(currentDate: Date): Date[] {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
 
-  // Start from Sunday of the week containing the first day of month
-  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
+  // Start from Monday of the week containing the first day of month
+  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
 
-  // End at Saturday of the week containing the last day of month
-  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+  // End at Sunday of the week containing the last day of month
+  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
 
   return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 }
@@ -43,8 +43,8 @@ export function generateMonthDays(currentDate: Date): Date[] {
  * @returns Array of 7 days for the week
  */
 export function generateWeekDays(currentDate: Date): Date[] {
-  const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
-  const weekEnd = endOfWeek(currentDate, { weekStartsOn: 0 });
+  const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
+  const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
 
   return eachDayOfInterval({ start: weekStart, end: weekEnd });
 }
@@ -103,7 +103,7 @@ export function entriesToEvents(
  * @param value - Value to parse
  * @returns Date object or null
  */
-function parseDate(value: any): Date | null {
+function parseDate(value: unknown): Date | null {
   if (!value) return null;
 
   if (value instanceof Date) {

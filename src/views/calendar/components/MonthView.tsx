@@ -25,7 +25,7 @@ interface MonthViewProps {
   onCreateEvent?: (date: Date) => void;
 }
 
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 /**
  * MonthView component displaying a monthly calendar grid.

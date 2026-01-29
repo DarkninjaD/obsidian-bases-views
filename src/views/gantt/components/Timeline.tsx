@@ -1,18 +1,20 @@
-import React from 'react';
+import * as React from 'react';
 import { format } from 'date-fns';
 import { generateTimelineMarkers } from '../utils/dateCalculations';
+import { GanttTimelineStep } from '../../../types/view-config';
 
 interface TimelineProps {
   start: Date;
   end: Date;
+  step?: GanttTimelineStep;
 }
 
 /**
  * Timeline header component showing dates.
  * Displays day numbers with month boundaries highlighted.
  */
-export const Timeline: React.FC<TimelineProps> = ({ start, end }) => {
-  const markers = generateTimelineMarkers(start, end);
+export const Timeline: React.FC<TimelineProps> = ({ start, end, step }) => {
+  const markers = generateTimelineMarkers(start, end, step || 'day');
   const dayWidth = `${100 / markers.length}%`;
 
   return (

@@ -4,7 +4,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { CalendarEvent } from '../../../types/view-config';
 import { Event } from './Event';
 import { formatDayNumber, formatDateString } from '../utils/dateUtils';
-import { isDayInMonth, isDayToday } from '../utils/calendarHelpers';
+import { isDayToday } from '../utils/calendarHelpers';
 
 interface DayCellProps {
   date: Date;

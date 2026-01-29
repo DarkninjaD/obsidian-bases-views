@@ -11,7 +11,7 @@ import { updateFileProperty } from '../utils/propertyUpdater';
  */
 export function usePropertyUpdate(app: App) {
   const updateProperty = useCallback(
-    async (file: TFile, propertyName: string, value: any) => {
+    async (file: TFile, propertyName: string, value: unknown) => {
       try {
         await updateFileProperty(app, file, propertyName, value);
       } catch (error) {

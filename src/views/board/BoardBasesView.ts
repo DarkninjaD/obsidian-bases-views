@@ -14,9 +14,7 @@ export class BoardBasesView extends ReactBasesView {
   type = BoardViewType;
 
   constructor(controller: QueryController, containerEl: HTMLElement) {
-    console.log('BoardBasesView constructor called');
     super(controller, containerEl);
-    console.log('BoardBasesView constructor completed');
   }
 
   /**
@@ -38,12 +36,8 @@ export class BoardBasesView extends ReactBasesView {
     const rawSubGroupBy = this.config.get('subGroupByProperty');
     const columnOrder = (this.config.get('columnOrder') as string[] | undefined) || [];
 
-    console.log('BoardBasesView: raw config values:', { rawGroupBy, rawSubGroupBy, columnOrder });
-
     const groupByProperty = this.extractPropertyName(rawGroupBy) || 'status';
     const subGroupByProperty = this.extractPropertyName(rawSubGroupBy) || '';
-
-    console.log('BoardBasesView: extracted properties:', { groupByProperty, subGroupByProperty });
 
     // Wrap in ErrorBoundary to catch React errors
     return React.createElement(

@@ -123,7 +123,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   const title = viewMode === 'month'
     ? formatMonthYear(currentDate)
     : viewMode === 'week'
-      ? formatWeekRange(startOfWeek(currentDate), endOfWeek(currentDate))
+      ? formatWeekRange(startOfWeek(currentDate, { weekStartsOn: 1 }), endOfWeek(currentDate, { weekStartsOn: 1 }))
       : formatFullDate(currentDate);
 
   return (

@@ -1,9 +1,8 @@
 import { useState, useCallback, useRef } from 'react';
 import { App } from 'obsidian';
-import { differenceInDays } from 'date-fns';
-import { Task } from '../../../types/view-config';
+import { Task, GanttTimelineStep } from '../../../types/view-config';
 import { usePropertyUpdate } from '../../../hooks/usePropertyUpdate';
-import { calculateDateFromDelta } from '../utils/dateCalculations';
+import { calculateDateFromDelta, getTimelineUnitCount } from '../utils/dateCalculations';
 
 interface UseTaskResizeOptions {
   task: Task;
@@ -11,6 +10,8 @@ interface UseTaskResizeOptions {
   timelineStart: Date;
   timelineEnd: Date;
   chartRef: React.RefObject<HTMLDivElement>;
+  onResizeEnd?: () => void;
+  timelineStep?: GanttTimelineStep;
 }
 
 /**
@@ -26,22 +27,23 @@ export function useTaskResize({
   timelineStart,
   timelineEnd,
   chartRef,
+  onResizeEnd,
+  timelineStep,
 }: UseTaskResizeOptions) {
   const [isResizing, setIsResizing] = useState(false);
   const resizeTypeRef = useRef<'start' | 'end' | null>(null);
   const hadMovementRef = useRef(false);
   const { updateProperty } = usePropertyUpdate(app);
+  const step = timelineStep || 'day';
 
   /**
-   * Calculate pixels per day based on actual chart width
+   * Calculate pixels per unit based on actual chart width and step
    */
-  const getPixelsPerDay = useCallback(() => {
-    // Add 1 because differenceInDays doesn't include the end date,
-    // but the timeline visually shows both start and end dates (inclusive)
-    const totalDays = differenceInDays(timelineEnd, timelineStart) + 1;
+  const getPixelsPerUnit = useCallback(() => {
+    const totalUnits = getTimelineUnitCount(timelineStart, timelineEnd, step);
     const chartWidth = chartRef.current?.getBoundingClientRect().width || 1000;
-    return chartWidth / totalDays;
-  }, [timelineStart, timelineEnd, chartRef]);
+    return chartWidth / totalUnits;
+  }, [timelineStart, timelineEnd, chartRef, step]);
 
   /**
    * Check if resize movement occurred and reset the flag.
@@ -68,8 +70,8 @@ export function useTaskResize({
       const startX = e.clientX;
       const originalDate = handle === 'start' ? task.startDate : task.endDate;
 
-      // Calculate pixels per day at resize start using actual chart width
-      const pixelsPerDay = getPixelsPerDay();
+      // Calculate pixels per unit at resize start using actual chart width
+      const pixelsPerUnit = getPixelsPerUnit();
 
       /**
        * Handle mouse move during resize
@@ -82,7 +84,7 @@ export function useTaskResize({
           hadMovementRef.current = true;
         }
 
-        const newDate = calculateDateFromDelta(originalDate, deltaX, pixelsPerDay);
+        const newDate = calculateDateFromDelta(originalDate, deltaX, pixelsPerUnit, step);
 
         // Update property immediately for visual feedback
         const propertyName =
@@ -90,15 +92,15 @@ export function useTaskResize({
 
         // Only update if date changed
         if (newDate.getTime() !== originalDate.getTime()) {
-          // Validate: start must be before end
-          if (handle === 'start' && newDate >= task.endDate) {
+          // Validate: start must be before or equal to end (allow 1-day events)
+          if (handle === 'start' && newDate > task.endDate) {
             return; // Don't allow start date to be after end date
           }
-          if (handle === 'end' && newDate <= task.startDate) {
+          if (handle === 'end' && newDate < task.startDate) {
             return; // Don't allow end date to be before start date
           }
 
-          updateProperty(task.file, propertyName, newDate.toISOString());
+          void updateProperty(task.file, propertyName, newDate.toISOString());
         }
       };
 
@@ -110,12 +112,13 @@ export function useTaskResize({
         resizeTypeRef.current = null;
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
+        onResizeEnd?.();
       };
 
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     },
-    [task, updateProperty, getPixelsPerDay]
+    [task, updateProperty, getPixelsPerUnit, step, onResizeEnd]
   );
 
   return {

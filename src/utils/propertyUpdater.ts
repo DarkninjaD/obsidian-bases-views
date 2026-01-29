@@ -13,21 +13,16 @@ export async function updateFileProperty(
   app: App,
   file: TFile,
   propertyName: string,
-  value: any
+  value: unknown
 ): Promise<void> {
   try {
-    console.log(`updateFileProperty: updating ${file.path} - ${propertyName} = ${value}`);
-
     // Use Obsidian's official API to update frontmatter
     await app.fileManager.processFrontMatter(file, (frontmatter) => {
       // Format the value appropriately
       frontmatter[propertyName] = formatValue(value);
-      console.log(`updateFileProperty: frontmatter updated:`, frontmatter);
     });
-
-    console.log(`updateFileProperty: ✓ successfully updated ${propertyName}`);
   } catch (error) {
-    console.error('updateFileProperty: ✗ failed to update property:', error);
+    console.error('Failed to update property:', error);
     throw error;
   }
 }
@@ -39,7 +34,7 @@ export async function updateFileProperty(
  * @param value - Value to format
  * @returns Formatted value for YAML
  */
-function formatValue(value: any): any {
+function formatValue(value: unknown): unknown {
   if (value === null || value === undefined) {
     return null;
   }

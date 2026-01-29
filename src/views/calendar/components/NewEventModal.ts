@@ -25,7 +25,7 @@ export class NewEventModal extends Modal {
   onOpen() {
     const { contentEl } = this;
 
-    contentEl.createEl('h2', { text: 'New Event' });
+    contentEl.createEl('h2', { text: 'New event' });
 
     // Event name input
     new Setting(contentEl)
@@ -45,7 +45,7 @@ export class NewEventModal extends Modal {
       .setName('Start time')
       .addText((text) =>
         text
-          .setPlaceholder('HH:mm')
+          .setPlaceholder('09:30')
           .setValue(format(this.startTime, 'HH:mm'))
           .onChange((value) => {
             const parsed = parse(value, 'HH:mm', this.startTime);
@@ -60,7 +60,7 @@ export class NewEventModal extends Modal {
       .setName('End time')
       .addText((text) =>
         text
-          .setPlaceholder('HH:mm')
+          .setPlaceholder('09:30')
           .setValue(format(this.endTime, 'HH:mm'))
           .onChange((value) => {
             const parsed = parse(value, 'HH:mm', this.endTime);

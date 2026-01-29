@@ -50,7 +50,7 @@ export const MultiDayEvent: React.FC<MultiDayEventProps> = ({
     onDragEnd: onInteractionEnd,
   });
 
-  const { isResizing, previewDelta: resizeDelta, handleResizeStart, consumeHadMovement: consumeResizeMovement } = useEventResize({
+  const { isResizing, handleResizeStart, consumeHadMovement: consumeResizeMovement } = useEventResize({
     event,
     app,
     containerRef,
@@ -82,6 +82,21 @@ export const MultiDayEvent: React.FC<MultiDayEventProps> = ({
 
   const isActive = isDragging || isResizing;
 
+  // Track position changes for animation
+  const [isUpdated, setIsUpdated] = React.useState(false);
+  const prevPositionRef = React.useRef({ startCol, colSpan });
+
+  React.useEffect(() => {
+    const prev = prevPositionRef.current;
+    if (prev.startCol !== startCol || prev.colSpan !== colSpan) {
+      // Position changed - trigger animation
+      setIsUpdated(true);
+      const timer = setTimeout(() => setIsUpdated(false), 300);
+      prevPositionRef.current = { startCol, colSpan };
+      return () => clearTimeout(timer);
+    }
+  }, [startCol, colSpan]);
+
   const style: React.CSSProperties = {
     gridColumn: `${startCol + 1} / span ${colSpan}`,
     gridRow: row + 1,
@@ -91,7 +106,7 @@ export const MultiDayEvent: React.FC<MultiDayEventProps> = ({
   return (
     <>
       <div
-        className={`bv-calendar-multi-day-event ${continuesBefore ? 'bv-continues-before' : ''} ${continuesAfter ? 'bv-continues-after' : ''} ${isActive ? 'bv-event-active' : ''}`}
+        className={`bv-calendar-multi-day-event ${continuesBefore ? 'bv-continues-before' : ''} ${continuesAfter ? 'bv-continues-after' : ''} ${isActive ? 'bv-event-active' : ''} ${isUpdated ? 'bv-event-updated' : ''}`}
         style={style}
         onClick={handleClick}
         onMouseEnter={handleMouseEnter}

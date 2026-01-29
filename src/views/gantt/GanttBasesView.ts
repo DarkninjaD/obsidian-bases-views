@@ -14,9 +14,7 @@ export class GanttBasesView extends ReactBasesView {
   type = GanttViewType;
 
   constructor(controller: QueryController, containerEl: HTMLElement) {
-    console.log('GanttBasesView constructor called');
     super(controller, containerEl);
-    console.log('GanttBasesView constructor completed');
   }
 
   /**
@@ -37,6 +35,7 @@ export class GanttBasesView extends ReactBasesView {
     const endDateProperty = this.extractPropertyName(this.config.get('endDateProperty')) || 'end';
     const groupByProperty = this.extractPropertyName(this.config.get('groupByProperty')) || '';
     const collapsedGroups = (this.config.get('collapsedGroups') as string[] | undefined) || [];
+    const timelineStep = (this.config.get('timelineStep') as 'day' | 'week' | 'month') || 'day';
 
     // Wrap in ErrorBoundary to catch React errors
     return React.createElement(
@@ -49,6 +48,7 @@ export class GanttBasesView extends ReactBasesView {
           endDateProperty,
           groupByProperty,
           collapsedGroups,
+          timelineStep,
         },
         onCollapsedGroupsChange: (groups: string[]) => {
           this.config.set('collapsedGroups', groups);
@@ -84,6 +84,17 @@ export class GanttBasesView extends ReactBasesView {
         type: 'property',
         default: '',
         placeholder: 'Select property (optional)',
+      },
+      {
+        key: 'timelineStep',
+        displayName: 'Timeline Step',
+        type: 'dropdown',
+        default: 'day',
+        options: {
+          day: 'Day',
+          week: 'Week',
+          month: 'Month',
+        },
       },
     ];
   }

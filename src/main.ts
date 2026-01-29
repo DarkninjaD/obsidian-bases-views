@@ -16,77 +16,68 @@ import {
  * - Calendar (Month/week calendar view)
  */
 export default class BasesCustomViewsPlugin extends Plugin {
-  async onload() {
-    console.log("Loading Bases Views plugin");
-
+  onload(): void {
     // Check if registerBasesView is available (requires Obsidian 1.10.0+)
-    if (typeof (this as any).registerBasesView !== "function") {
+    if (typeof (this as unknown as { registerBasesView?: unknown }).registerBasesView !== "function") {
       console.error(
         "registerBasesView is not available - Obsidian version may be too old (need 1.10.0+)",
       );
       return;
     }
 
+    const plugin = this as unknown as {
+      registerBasesView: (viewType: string, config: {
+        name: string;
+        icon: string;
+        factory: (controller: unknown, containerEl: HTMLElement) => unknown;
+        options: unknown;
+      }) => boolean;
+    };
+
     // Register Board view
     try {
-      console.log("Registering Board view...");
-      const boardRegistered = (this as any).registerBasesView(BoardViewType, {
+      plugin.registerBasesView(BoardViewType, {
         name: "Board",
         icon: "lucide-layout-dashboard",
-        factory: (controller: any, containerEl: HTMLElement) => {
-          console.log("Board factory called with controller:", controller);
+        factory: (controller: unknown, containerEl: HTMLElement) => {
           return new BoardBasesView(controller, containerEl);
         },
         options: BoardBasesView.getViewOptions,
       });
-      console.log("✓ Board view registration result:", boardRegistered);
     } catch (e) {
-      console.error("✗ Failed to register Board view:", e);
+      console.error("Failed to register Board view:", e);
     }
 
     // Register Gantt view
     try {
-      console.log("Registering Gantt view...");
-      const ganttRegistered = (this as any).registerBasesView(GanttViewType, {
+      plugin.registerBasesView(GanttViewType, {
         name: "Gantt",
         icon: "lucide-gantt-chart",
-        factory: (controller: any, containerEl: HTMLElement) => {
-          console.log("Gantt factory called with controller:", controller);
+        factory: (controller: unknown, containerEl: HTMLElement) => {
           return new GanttBasesView(controller, containerEl);
         },
         options: GanttBasesView.getViewOptions,
       });
-      console.log("✓ Gantt view registration result:", ganttRegistered);
     } catch (e) {
-      console.error("✗ Failed to register Gantt view:", e);
+      console.error("Failed to register Gantt view:", e);
     }
 
     // Register Calendar view
     try {
-      console.log("Registering Calendar view...");
-      const calendarRegistered = (this as any).registerBasesView(
-        CalendarViewType,
-        {
-          name: "Calendar",
-          icon: "lucide-calendar",
-          factory: (controller: any, containerEl: HTMLElement) => {
-            console.log("Calendar factory called with controller:", controller);
-            return new CalendarBasesView(controller, containerEl);
-          },
-          options: CalendarBasesView.getViewOptions,
+      plugin.registerBasesView(CalendarViewType, {
+        name: "Calendar",
+        icon: "lucide-calendar",
+        factory: (controller: unknown, containerEl: HTMLElement) => {
+          return new CalendarBasesView(controller, containerEl);
         },
-      );
-      console.log("✓ Calendar view registration result:", calendarRegistered);
+        options: CalendarBasesView.getViewOptions,
+      });
     } catch (e) {
-      console.error("✗ Failed to register Calendar view:", e);
+      console.error("Failed to register Calendar view:", e);
     }
-
-    console.log("Bases Views plugin loaded successfully");
   }
 
-  async onunload() {
-    console.log("Unloading Bases Views plugin");
-
+  onunload(): void {
     // Remove injected styles
     const styleEl = document.getElementById("bases-views-styles");
     if (styleEl) {

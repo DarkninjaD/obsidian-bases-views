@@ -84,11 +84,27 @@ export const GanttView: React.FC<GanttViewProps> = ({
 
   // Ref for the chart container (used for drag-to-group detection)
   const chartRef = React.useRef<HTMLDivElement>(null);
+  // Ref to track if interaction (drag/resize) just ended - prevents accidental task creation
+  const interactionCooldownRef = React.useRef(false);
+
+  /**
+   * Mark that an interaction just ended (called from TaskBar after drag/resize)
+   */
+  const handleInteractionEnd = React.useCallback(() => {
+    interactionCooldownRef.current = true;
+    // Clear cooldown after a short delay
+    setTimeout(() => {
+      interactionCooldownRef.current = false;
+    }, 100);
+  }, []);
 
   /**
    * Handle click on chart to create a new task
    */
   const handleChartClick = React.useCallback((e: React.MouseEvent) => {
+    // Ignore clicks right after drag/resize ended
+    if (interactionCooldownRef.current) return;
+
     // Only handle direct clicks on the chart or grid, not on task bars
     const target = e.target as HTMLElement;
     if (target.closest('.bv-gantt-task-bar') || target.closest('.bv-gantt-group-header')) return;
@@ -152,7 +168,7 @@ export const GanttView: React.FC<GanttViewProps> = ({
         {/* Right side with timeline and chart */}
         <div className="bv-gantt-chart-wrapper">
           {/* Timeline header */}
-          <Timeline start={timelineStart} end={timelineEnd} />
+          <Timeline start={timelineStart} end={timelineEnd} step={options.timelineStep} />
 
           {/* Chart area with grid and task bars */}
           <div
@@ -162,7 +178,7 @@ export const GanttView: React.FC<GanttViewProps> = ({
             onClick={handleChartClick}
           >
             {/* Background grid */}
-            <Grid start={timelineStart} end={timelineEnd} rowCount={maxRow + 1} />
+            <Grid start={timelineStart} end={timelineEnd} rowCount={maxRow + 1} step={options.timelineStep} />
 
             {/* Group headers */}
             {groups.map((group) => (
@@ -187,6 +203,8 @@ export const GanttView: React.FC<GanttViewProps> = ({
                 groups={groups}
                 groupByProperty={groupByProperty}
                 chartRef={chartRef}
+                onInteractionEnd={handleInteractionEnd}
+                timelineStep={options.timelineStep}
               />
             ))}
 

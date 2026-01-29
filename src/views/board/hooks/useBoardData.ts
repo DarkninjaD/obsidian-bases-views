@@ -36,8 +36,6 @@ export function useBoardData(
 
   // Transform Bases data to our internal format
   const entries = useMemo(() => {
-    console.log('useBoardData: processing data:', data);
-    console.log('useBoardData: data.data length:', data?.data?.length);
     return adaptBasesData(data, app);
   }, [data, app]);
 

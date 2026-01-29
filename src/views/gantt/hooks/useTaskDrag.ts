@@ -1,9 +1,8 @@
 import { useState, useCallback, useRef } from 'react';
 import { App } from 'obsidian';
-import { differenceInDays } from 'date-fns';
-import { Task, TaskGroup } from '../../../types/view-config';
+import { Task, TaskGroup, GanttTimelineStep } from '../../../types/view-config';
 import { usePropertyUpdate } from '../../../hooks/usePropertyUpdate';
-import { calculateDateFromDelta } from '../utils/dateCalculations';
+import { calculateDateFromDelta, getTimelineUnitCount } from '../utils/dateCalculations';
 
 interface UseTaskDragOptions {
   task: Task;
@@ -13,6 +12,8 @@ interface UseTaskDragOptions {
   groups: TaskGroup[];
   groupByProperty: string;
   chartRef: React.RefObject<HTMLDivElement>;
+  onDragEnd?: () => void;
+  timelineStep?: GanttTimelineStep;
 }
 
 /**
@@ -52,24 +53,25 @@ export function useTaskDrag({
   groups,
   groupByProperty,
   chartRef,
+  onDragEnd,
+  timelineStep,
 }: UseTaskDragOptions) {
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
   const hadMovementRef = useRef(false);
   const { updateProperty } = usePropertyUpdate(app);
+  const step = timelineStep || 'day';
 
   const ROW_HEIGHT = 40;
 
   /**
-   * Calculate pixels per day based on actual chart width
+   * Calculate pixels per unit based on actual chart width and step
    */
-  const getPixelsPerDay = useCallback(() => {
-    // Add 1 because differenceInDays doesn't include the end date,
-    // but the timeline visually shows both start and end dates (inclusive)
-    const totalDays = differenceInDays(timelineEnd, timelineStart) + 1;
+  const getPixelsPerUnit = useCallback(() => {
+    const totalUnits = getTimelineUnitCount(timelineStart, timelineEnd, step);
     const chartWidth = chartRef.current?.getBoundingClientRect().width || 1000;
-    return chartWidth / totalDays;
-  }, [timelineStart, timelineEnd, chartRef]);
+    return chartWidth / totalUnits;
+  }, [timelineStart, timelineEnd, chartRef, step]);
 
   /**
    * Check if drag movement occurred and reset the flag.
@@ -100,8 +102,8 @@ export function useTaskDrag({
       const originalEndDate = task.endDate;
       const originalGroup = task.group;
 
-      // Calculate pixels per day at drag start using actual chart width
-      const pixelsPerDay = getPixelsPerDay();
+      // Calculate pixels per unit at drag start using actual chart width
+      const pixelsPerUnit = getPixelsPerUnit();
 
       /**
        * Handle mouse move during drag
@@ -118,12 +120,12 @@ export function useTaskDrag({
         }
 
         // Calculate new dates based on horizontal movement
-        const newStartDate = calculateDateFromDelta(originalStartDate, deltaX, pixelsPerDay);
-        const newEndDate = calculateDateFromDelta(originalEndDate, deltaX, pixelsPerDay);
+        const newStartDate = calculateDateFromDelta(originalStartDate, deltaX, pixelsPerUnit, step);
+        const newEndDate = calculateDateFromDelta(originalEndDate, deltaX, pixelsPerUnit, step);
 
         // Update both date properties
-        updateProperty(task.file, task.startDateProperty, newStartDate.toISOString());
-        updateProperty(task.file, task.endDateProperty, newEndDate.toISOString());
+        void updateProperty(task.file, task.startDateProperty, newStartDate.toISOString());
+        void updateProperty(task.file, task.endDateProperty, newEndDate.toISOString());
 
       };
 
@@ -141,7 +143,7 @@ export function useTaskDrag({
           if (newGroup && newGroup !== originalGroup) {
             // Handle "No Group" - set empty value
             const groupValue = newGroup === 'No Group' ? '' : newGroup;
-            updateProperty(task.file, groupByProperty, groupValue);
+            void updateProperty(task.file, groupByProperty, groupValue);
           }
         }
 
@@ -149,12 +151,13 @@ export function useTaskDrag({
         dragStartRef.current = null;
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
+        onDragEnd?.();
       };
 
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     },
-    [task, updateProperty, getPixelsPerDay, groups, groupByProperty, chartRef]
+    [task, updateProperty, getPixelsPerUnit, step, groups, groupByProperty, chartRef, onDragEnd]
   );
 
   return {

@@ -26,14 +26,11 @@ export abstract class ReactBasesView extends BasesView implements HoverParent {
   hoverPopover: HoverPopover | null = null;
 
   constructor(controller: QueryController, containerEl: HTMLElement) {
-    console.log('ReactBasesView constructor called');
     super(controller);
     this.containerEl = containerEl;
 
     // Style container
     this.containerEl.addClass('bases-view-container');
-
-    console.log('ReactBasesView constructor completed');
   }
 
   /**
@@ -41,10 +38,6 @@ export abstract class ReactBasesView extends BasesView implements HoverParent {
    */
   override onload(): void {
     super.onload();
-    console.log('ReactBasesView.onload() called');
-    console.log('  this.data:', this.data);
-    console.log('  this.data.data length:', this.data?.data?.length);
-    console.log('  this.data.groupedData length:', this.data?.groupedData?.length);
 
     // Render if data object exists (even if empty - show empty view)
     if (this.data) {
@@ -61,7 +54,7 @@ export abstract class ReactBasesView extends BasesView implements HoverParent {
   private showLoadingMessage(): void {
     this.containerEl.empty();
     const loadingDiv = this.containerEl.createDiv({ cls: 'bv-loading' });
-    loadingDiv.createEl('div', { text: 'Loading data from Bases...' });
+    loadingDiv.createEl('div', { text: 'Loading data from bases...' });
   }
 
   /**
@@ -77,13 +70,8 @@ export abstract class ReactBasesView extends BasesView implements HoverParent {
    * Render or re-render the React component
    */
   private render(): void {
-    console.log('ReactBasesView.render() called');
-    console.log('  this.data:', this.data);
-    console.log('  this.data.data length:', this.data?.data?.length);
-
     // Don't render if data object not available yet
     if (!this.data) {
-      console.warn('ReactBasesView.render() skipped - no data object');
       this.showLoadingMessage();
       return;
     }
@@ -103,19 +91,11 @@ export abstract class ReactBasesView extends BasesView implements HoverParent {
    * This is a notification - data is in this.data property.
    */
   onDataUpdated(): void {
-    console.log('ReactBasesView.onDataUpdated() called');
-    console.log('  this.data:', this.data);
-    console.log('  this.data type:', typeof this.data);
-    console.log('  this.data.data length:', this.data?.data?.length);
-    console.log('  this.data.groupedData length:', this.data?.groupedData?.length);
-
     // Data is in this.data (inherited from BasesView)
     // Render even with empty data to show empty state UI
     if (this.data) {
-      console.log('  ✓ Data object exists, rendering...');
       this.render();
     } else {
-      console.warn('  ✗ No data object yet');
       this.showLoadingMessage();
     }
   }
@@ -125,7 +105,6 @@ export abstract class ReactBasesView extends BasesView implements HoverParent {
    * Unmounts React component and cleans up resources.
    */
   override onunload(): void {
-    console.log('ReactBasesView.onunload() called');
     if (this.root) {
       this.root.unmount();
       this.root = null;

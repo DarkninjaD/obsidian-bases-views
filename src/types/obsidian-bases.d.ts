@@ -52,13 +52,13 @@ declare module 'obsidian' {
     id: string;
     name: string;
     type: 'text' | 'number' | 'toggle' | 'dropdown' | 'property-selector';
-    defaultValue?: any;
+    defaultValue?: unknown;
     filter?: string;
   }
 
   // Entry Group - a group of entries
   export interface BasesEntryGroup {
-    key: any;
+    key: unknown;
     entries: BasesEntry[];
     hasKey: () => boolean;
   }
@@ -66,7 +66,7 @@ declare module 'obsidian' {
   // Entry - a single note/file in the base
   export interface BasesEntry {
     file: TFile;
-    getValue(property: string): any;
+    getValue(property: string): unknown;
   }
 
   // Property ID

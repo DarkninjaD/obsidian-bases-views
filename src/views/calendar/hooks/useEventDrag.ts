@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 import { DragEndEvent } from '@dnd-kit/core';
-import { parseISO } from 'date-fns';
 import { App } from 'obsidian';
 import { CalendarEvent } from '../../../types/view-config';
 import { usePropertyUpdate } from '../../../hooks/usePropertyUpdate';
@@ -41,17 +40,11 @@ export function useEventDrag(
       // The droppable ID is the date string (ISO format)
       const newDateString = over.id as string;
 
-      try {
-        const newDate = parseISO(newDateString);
-
-        // Only update if date actually changed
-        const oldDateString = formatDateString(calendarEvent.date);
-        if (oldDateString !== newDateString) {
-          // Write in YYYY-MM-DD format to preserve local date
-          updateProperty(calendarEvent.file, dateProperty, newDateString);
-        }
-      } catch (error) {
-        console.error('Failed to parse new date:', error);
+      // Only update if date actually changed
+      const oldDateString = formatDateString(calendarEvent.date);
+      if (oldDateString !== newDateString) {
+        // Write in YYYY-MM-DD format to preserve local date
+        void updateProperty(calendarEvent.file, dateProperty, newDateString);
       }
     },
     [events, dateProperty, updateProperty]

@@ -31,7 +31,7 @@ export function useMultiDayEventDrag({
   const [isDragging, setIsDragging] = useState(false);
   const [previewDelta, setPreviewDelta] = useState<number>(0);
   const [cursorPosition, setCursorPosition] = useState<{ x: number; y: number } | null>(null);
-  const dragStartRef = useRef<{ x: number; startDate: Date; endDate: Date } | null>(null);
+  const dragStartRef = useRef<{ x: number; y: number; startDate: Date; endDate: Date } | null>(null);
   const hadMovementRef = useRef(false);
   const { updateProperty } = usePropertyUpdate(app);
   const { setHighlightedDates, clearHighlights } = useCalendarDrag();
@@ -42,6 +42,14 @@ export function useMultiDayEventDrag({
   const getDayWidth = useCallback(() => {
     if (!containerRef.current) return 100;
     return containerRef.current.getBoundingClientRect().width / 7;
+  }, [containerRef]);
+
+  /**
+   * Get the height of one week row in pixels
+   */
+  const getRowHeight = useCallback(() => {
+    if (!containerRef.current) return 100;
+    return containerRef.current.getBoundingClientRect().height;
   }, [containerRef]);
 
   /**
@@ -71,11 +79,13 @@ export function useMultiDayEventDrag({
 
       dragStartRef.current = {
         x: e.clientX,
+        y: e.clientY,
         startDate,
         endDate,
       };
 
       const dayWidth = getDayWidth();
+      const rowHeight = getRowHeight();
 
       let currentDeltaDays = 0;
 
@@ -83,9 +93,16 @@ export function useMultiDayEventDrag({
         if (!dragStartRef.current) return;
 
         const deltaX = moveEvent.clientX - dragStartRef.current.x;
-        currentDeltaDays = Math.round(deltaX / dayWidth);
+        const deltaY = moveEvent.clientY - dragStartRef.current.y;
 
-        if (Math.abs(deltaX) > 5) {
+        // Calculate column delta (horizontal movement within week)
+        const colDelta = Math.round(deltaX / dayWidth);
+        // Calculate row delta (vertical movement between weeks)
+        const rowDelta = Math.round(deltaY / rowHeight);
+        // Total day delta = column movement + (row movement * 7 days per week)
+        currentDeltaDays = colDelta + (rowDelta * 7);
+
+        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
           hadMovementRef.current = true;
         }
 
@@ -107,8 +124,8 @@ export function useMultiDayEventDrag({
           const newStartDate = addDays(dragStartRef.current.startDate, currentDeltaDays);
           const newEndDate = addDays(dragStartRef.current.endDate, currentDeltaDays);
 
-          updateProperty(event.file, dateProperty, formatDateString(newStartDate));
-          updateProperty(event.file, endDateProperty, formatDateString(newEndDate));
+          void updateProperty(event.file, dateProperty, formatDateString(newStartDate));
+          void updateProperty(event.file, endDateProperty, formatDateString(newEndDate));
         }
 
         setIsDragging(false);
