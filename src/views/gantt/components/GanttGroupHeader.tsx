@@ -55,7 +55,7 @@ export const GanttGroupHeader: React.FC<GanttGroupHeaderProps> = ({
   const saveGroupName = React.useCallback(() => {
     const newName = editValue.trim();
     if (newName && newName !== group.name && onRenameGroup) {
-      onRenameGroup(group.name, newName);
+      void onRenameGroup(group.name, newName);
     } else {
       setEditValue(group.name);
     }

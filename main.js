@@ -14128,11 +14128,23 @@ function extractAllProperties(entry, app) {
 }
 
 // src/views/board/utils/boardHelpers.ts
+function valueToString(value) {
+  if (typeof value === "object" && value !== null) {
+    return JSON.stringify(value);
+  }
+  if (typeof value === "string") {
+    return value;
+  }
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  return String(value);
+}
 function groupEntriesByProperty(entries, propertyName) {
   const groups = /* @__PURE__ */ new Map();
   entries.forEach((entry) => {
     const propertyValue = entry.properties[propertyName];
-    const groupKey = propertyValue !== void 0 && propertyValue !== null ? typeof propertyValue === "object" ? JSON.stringify(propertyValue) : String(propertyValue) : "Uncategorized";
+    const groupKey = propertyValue !== void 0 && propertyValue !== null ? valueToString(propertyValue) : "Uncategorized";
     const group = groups.get(groupKey) || [];
     group.push(entry);
     groups.set(groupKey, group);
@@ -14457,7 +14469,7 @@ var Column = ({
     id: dropId
   });
   const handleNewPage = () => {
-    onNewPage == null ? void 0 : onNewPage(dropId);
+    void (onNewPage == null ? void 0 : onNewPage(dropId));
   };
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -14530,7 +14542,7 @@ var GridCell = ({
     id: dropId
   });
   const handleNewPage = () => {
-    onNewPage == null ? void 0 : onNewPage(dropId);
+    void (onNewPage == null ? void 0 : onNewPage(dropId));
   };
   return /* @__PURE__ */ React8.createElement(
     "div",
@@ -14652,7 +14664,7 @@ var TextInputModal = class extends import_obsidian2.Modal {
       (btn) => btn.setButtonText("Create").setCta().onClick(() => {
         this.close();
         if (this.result.trim()) {
-          this.onSubmit(this.result.trim());
+          void this.onSubmit(this.result.trim());
         }
       })
     );
@@ -18925,6 +18937,18 @@ function subWeeks(date, amount) {
 var import_react9 = __toESM(require_react());
 
 // src/views/gantt/utils/ganttHelpers.ts
+function valueToString2(value) {
+  if (typeof value === "object" && value !== null) {
+    return JSON.stringify(value);
+  }
+  if (typeof value === "string") {
+    return value;
+  }
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  return String(value);
+}
 function entriesToTasks(entries, startDateProperty, endDateProperty, groupByProperty) {
   const tasks = [];
   entries.forEach((entry, index) => {
@@ -18933,7 +18957,7 @@ function entriesToTasks(entries, startDateProperty, endDateProperty, groupByProp
     const startDate = parseDate2(startValue);
     const endDate = parseDate2(endValue);
     const rawGroupValue = groupByProperty ? entry.properties[groupByProperty] : void 0;
-    const groupValue = groupByProperty ? rawGroupValue !== void 0 && rawGroupValue !== null ? typeof rawGroupValue === "object" ? JSON.stringify(rawGroupValue) : String(rawGroupValue) : "No Group" : void 0;
+    const groupValue = groupByProperty ? rawGroupValue !== void 0 && rawGroupValue !== null ? valueToString2(rawGroupValue) : "No Group" : void 0;
     if (startDate && endDate) {
       tasks.push({
         id: entry.id,
@@ -19604,7 +19628,7 @@ var GanttGroupHeader = ({
   const saveGroupName = React18.useCallback(() => {
     const newName = editValue.trim();
     if (newName && newName !== group.name && onRenameGroup) {
-      onRenameGroup(group.name, newName);
+      void onRenameGroup(group.name, newName);
     } else {
       setEditValue(group.name);
     }
@@ -20928,7 +20952,7 @@ var NewEventModal = class extends import_obsidian3.Modal {
         if (this.startTime > this.endTime) {
           [this.startTime, this.endTime] = [this.endTime, this.startTime];
         }
-        this.onSubmit(this.eventName.trim(), this.startTime, this.endTime);
+        void this.onSubmit(this.eventName.trim(), this.startTime, this.endTime);
       })
     );
     contentEl.addEventListener("keydown", (e) => {
@@ -20938,7 +20962,7 @@ var NewEventModal = class extends import_obsidian3.Modal {
         if (this.startTime > this.endTime) {
           [this.startTime, this.endTime] = [this.endTime, this.startTime];
         }
-        this.onSubmit(this.eventName.trim(), this.startTime, this.endTime);
+        void this.onSubmit(this.eventName.trim(), this.startTime, this.endTime);
       }
     });
   }

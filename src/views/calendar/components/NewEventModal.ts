@@ -90,7 +90,7 @@ export class NewEventModal extends Modal {
               // Swap if start is after end
               [this.startTime, this.endTime] = [this.endTime, this.startTime];
             }
-            this.onSubmit(this.eventName.trim(), this.startTime, this.endTime);
+            void this.onSubmit(this.eventName.trim(), this.startTime, this.endTime);
           })
       );
 
@@ -102,7 +102,7 @@ export class NewEventModal extends Modal {
         if (this.startTime > this.endTime) {
           [this.startTime, this.endTime] = [this.endTime, this.startTime];
         }
-        this.onSubmit(this.eventName.trim(), this.startTime, this.endTime);
+        void this.onSubmit(this.eventName.trim(), this.startTime, this.endTime);
       }
     });
   }

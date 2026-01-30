@@ -37,7 +37,7 @@ export const GridCell: React.FC<GridCellProps> = ({
   });
 
   const handleNewPage = () => {
-    onNewPage?.(dropId);
+    void onNewPage?.(dropId);
   };
 
   return (

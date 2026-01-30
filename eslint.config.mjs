@@ -48,8 +48,10 @@ export default tseslint.config(
       "@typescript-eslint/no-unsafe-call": "off",
       "@typescript-eslint/no-unsafe-return": "off",
       "@typescript-eslint/no-unsafe-argument": "off",
-      "@typescript-eslint/no-floating-promises": "off",
-      "@typescript-eslint/no-base-to-string": "off",
+
+      // Required by Obsidian Plugin Review
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/no-base-to-string": "error",
 
       // General rules
       "no-console": ["error", { allow: ["warn", "error", "debug"] }],

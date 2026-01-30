@@ -52,7 +52,7 @@ export const Column: React.FC<ColumnProps> = ({
   });
 
   const handleNewPage = () => {
-    onNewPage?.(dropId);
+    void onNewPage?.(dropId);
   };
 
   const style: React.CSSProperties = {

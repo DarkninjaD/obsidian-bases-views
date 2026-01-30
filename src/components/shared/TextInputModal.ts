@@ -52,7 +52,7 @@ export class TextInputModal extends Modal {
           .onClick(() => {
             this.close();
             if (this.result.trim()) {
-              this.onSubmit(this.result.trim());
+              void this.onSubmit(this.result.trim());
             }
           })
       );

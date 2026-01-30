@@ -2,6 +2,23 @@ import { BasesEntry, Task, TaskGroup } from '../../../types/view-config';
 import { parseISO, isValid } from 'date-fns';
 
 /**
+ * Safely convert any value to a string.
+ * Objects are JSON-stringified, primitives use String().
+ */
+function valueToString(value: unknown): string {
+  if (typeof value === 'object' && value !== null) {
+    return JSON.stringify(value);
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  return String(value);
+}
+
+/**
  * Transform entries into tasks for Gantt view.
  * Filters entries that have valid start and end dates.
  *
@@ -31,9 +48,7 @@ export function entriesToTasks(
     const rawGroupValue = groupByProperty ? entry.properties[groupByProperty] : undefined;
     const groupValue = groupByProperty
       ? (rawGroupValue !== undefined && rawGroupValue !== null
-          ? (typeof rawGroupValue === 'object'
-              ? JSON.stringify(rawGroupValue)
-              : String(rawGroupValue))
+          ? valueToString(rawGroupValue)
           : 'No Group')
       : undefined;
 

@@ -1,6 +1,23 @@
 import { BasesEntry } from '../../../types/view-config';
 
 /**
+ * Safely convert any value to a string.
+ * Objects are JSON-stringified, primitives use String().
+ */
+function valueToString(value: unknown): string {
+  if (typeof value === 'object' && value !== null) {
+    return JSON.stringify(value);
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  return String(value);
+}
+
+/**
  * Group entries by a property value.
  * Creates a Map where keys are property values and values are arrays of entries.
  *
@@ -18,9 +35,7 @@ export function groupEntriesByProperty(
     // Get the property value, default to 'Uncategorized' if not set
     const propertyValue = entry.properties[propertyName];
     const groupKey = propertyValue !== undefined && propertyValue !== null
-      ? (typeof propertyValue === 'object'
-          ? JSON.stringify(propertyValue)
-          : String(propertyValue))
+      ? valueToString(propertyValue)
       : 'Uncategorized';
 
     // Add entry to the appropriate group
