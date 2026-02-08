@@ -1,6 +1,6 @@
 {
   "name": "obsidian-bases-view-plugin",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Custom Bases views: Board, Gantt, and Calendar for Obsidian",
   "main": "main.js",
   "scripts": {
