@@ -34,6 +34,7 @@ export class GanttBasesView extends ReactBasesView {
     const startDateProperty = this.extractPropertyName(this.config.get('startDateProperty')) || 'start';
     const endDateProperty = this.extractPropertyName(this.config.get('endDateProperty')) || 'end';
     const groupByProperty = this.extractPropertyName(this.config.get('groupByProperty')) || '';
+    const hierarchyProperty = this.extractPropertyName(this.config.get('hierarchyProperty')) || 'Parent';
     const collapsedGroups = (this.config.get('collapsedGroups') as string[] | undefined) || [];
     const timelineStep = (this.config.get('timelineStep') as 'day' | 'week' | 'month') || 'day';
 
@@ -47,6 +48,7 @@ export class GanttBasesView extends ReactBasesView {
           startDateProperty,
           endDateProperty,
           groupByProperty,
+          hierarchyProperty,
           collapsedGroups,
           timelineStep,
         },
@@ -84,6 +86,13 @@ export class GanttBasesView extends ReactBasesView {
         type: 'property',
         default: '',
         placeholder: 'Select property (optional)',
+      },
+      {
+        key: 'hierarchyProperty',
+        displayName: 'Hierarchy (Parent)',
+        type: 'property',
+        default: 'Parent',
+        placeholder: 'Select parent link property',
       },
       {
         key: 'timelineStep',
