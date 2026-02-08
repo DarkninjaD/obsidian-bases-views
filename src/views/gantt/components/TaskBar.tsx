@@ -76,10 +76,10 @@ export const TaskBar: React.FC<TaskBarProps> = ({
   const { handleMouseEnter, handleMouseLeave } = useHoverPreview(
     app,
     hoverParent,
-    task.file
+    task.file || null
   );
 
-  const openNote = createNoteOpener(app, task.file);
+  const openNote = task.file ? createNoteOpener(app, task.file) : () => {};
 
   // Focus input when entering edit mode
   React.useEffect(() => {
@@ -93,6 +93,8 @@ export const TaskBar: React.FC<TaskBarProps> = ({
    * Save the new task name by renaming the file
    */
   const saveTaskName = React.useCallback(async () => {
+    if (!task.file) return; // Cannot rename virtual tasks
+
     const newName = editValue.trim();
     if (newName && newName !== task.title) {
       try {
@@ -116,15 +118,17 @@ export const TaskBar: React.FC<TaskBarProps> = ({
   const handleDoubleClick = React.useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!task.file) return; // Prevent editing virtual tasks
     setEditValue(task.title);
     setIsEditing(true);
-  }, [task.title]);
+  }, [task.title, task.file]);
 
   /**
    * Handle click - only open note if no drag/resize occurred
    */
   const handleClick = React.useCallback((e: React.MouseEvent) => {
     if (isEditing) return;
+    if (!task.file) return;
 
     // Check if there was any movement during drag or resize
     const hadDrag = consumeDragMovement();
@@ -137,7 +141,7 @@ export const TaskBar: React.FC<TaskBarProps> = ({
     }
 
     openNote(e);
-  }, [isEditing, consumeDragMovement, consumeResizeMovement, openNote]);
+  }, [isEditing, consumeDragMovement, consumeResizeMovement, openNote, task.file]);
 
   /**
    * Handle keyboard events in edit mode

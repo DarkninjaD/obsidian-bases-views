@@ -48,16 +48,6 @@ export function extractLinkText(value: unknown): string {
     return valueToString(value);
 }
 
-/**
- * Transform entries into tasks for Gantt view.
- * Filters entries that have valid start and end dates.
- *
- * @param entries - Array of entries
- * @param startDateProperty - Property name for start date
- * @param endDateProperty - Property name for end date
- * @param groupByProperty - Optional property name for grouping
- * @returns Array of tasks
- */
 
 /**
  * Transform entries into tasks for Gantt view.
@@ -100,7 +90,9 @@ export function entriesToTasks(
     if (hierarchyProperty) {
         const rawParent = entry.properties[hierarchyProperty];
         if (rawParent) {
-            parentId = extractLinkText(rawParent);
+            // Handle array values (pick first parent if multiple)
+            const parentValue = Array.isArray(rawParent) ? rawParent[0] : rawParent;
+            parentId = extractLinkText(parentValue);
         }
     }
 
@@ -136,32 +128,27 @@ export function entriesToTasks(
 export function sortTasksByHierarchy(tasks: Task[]): Task[] {
     const taskMap = new Map<string, Task>();
     const childrenMap = new Map<string, Task[]>();
+    const hasParent = new Set<string>();
 
     // 1. Build maps
     tasks.forEach(task => {
-        // Map by Basename for easier linking (flexible matching)
-        // OR by full Path (ID). Bases usually stores links as [[Name]] which matches Basename.
-        // Let's store both if possible, but for lookup we need to match what extractLinkText returns.
-        // extractLinkText returns basename usually.
-        taskMap.set(task.title, task); // Primary key: Title/Basename
-        taskMap.set(task.id, task);    // Secondary key: File Path
+        taskMap.set(task.title, task);
+        taskMap.set(task.id, task);
     });
 
+    // 2. Identify relationships
     tasks.forEach(task => {
         if (task.parentId) {
-            // Find parent
             const parent = taskMap.get(task.parentId);
             if (parent) {
-                // Determine the "canonical" ID for the parent to group children
-                // We use the parent's Title as the key in childrenMap
-                // because that's what we likely searched for.
                 const parentKey = parent.title;
                 if (!childrenMap.has(parentKey)) {
                     childrenMap.set(parentKey, []);
                 }
                 childrenMap.get(parentKey)!.push(task);
+                hasParent.add(task.title);
             } else {
-                // Parent not found -> Treat as Orphan (Root)
+                // Invalid parent -> Treat as if no parent (but keep ID for reference if needed)
                 task.parentId = undefined;
             }
         }
@@ -169,61 +156,85 @@ export function sortTasksByHierarchy(tasks: Task[]): Task[] {
 
     const sortedTasks: Task[] = [];
     const visited = new Set<string>();
-    const processing = new Set<string>(); // Cycle detection
+    const processing = new Set<string>();
 
-    function visit(task: Task) {
+    // Recursive visit
+    function visit(task: Task, depth: number = 0) {
         if (visited.has(task.title)) return;
         if (processing.has(task.title)) {
-            console.warn(`Cycle detected for task: ${task.title}`);
+            console.warn(`Cycle detected: ${task.title}`);
             return;
         }
 
         processing.add(task.title);
-
-        // Add self
-        sortedTasks.push(task);
         visited.add(task.title);
+        sortedTasks.push(task);
 
-        // Visit children
         const children = childrenMap.get(task.title);
         if (children) {
-            // Sort children by date (optional, but good for Gantt)
+            // Sort children by date
             children.sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
-            children.forEach(child => visit(child));
+            children.forEach(child => visit(child, depth + 1));
         }
 
         processing.delete(task.title);
     }
 
-    // 2. Start DFS from Roots (tasks with no parent)
+    // 3. Separate Roots (Valid Parent or Children) from True Orphans (No Parent + No Children)
+    const roots: Task[] = [];
+    const trueOrphans: Task[] = [];
+
     tasks.forEach(task => {
-        if (!task.parentId) {
-            visit(task);
+        if (!hasParent.has(task.title)) {
+            // It has no parent. Does it have children?
+            if (childrenMap.has(task.title) && childrenMap.get(task.title)!.length > 0) {
+                roots.push(task);
+            } else {
+                // No parent, no children -> True Orphan
+                trueOrphans.push(task);
+            }
         }
     });
 
-    // 3. Handle any remaining tasks (e.g. part of a detached cycle or tricky orphans)
-    tasks.forEach(task => {
-        if (!visited.has(task.title)) {
-            // It was part of a cycle or lookup failed weirdly. Add it to bottom.
-            visit(task);
-        }
-    });
+    // 4. Sort Roots by Date
+    roots.sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
 
-    // 4. Re-assign rows based on new order
+    // 5. Visit Roots (and their children)
+    roots.forEach(root => visit(root));
+
+    // 6. Handle True Orphans
+    if (trueOrphans.length > 0) {
+        // Sort orphans by date
+        trueOrphans.sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+
+        // Calculate bounds for virtual parent
+        const minDate = new Date(Math.min(...trueOrphans.map(t => t.startDate.getTime())));
+        const maxDate = new Date(Math.max(...trueOrphans.map(t => t.endDate.getTime())));
+
+        const virtualOrphanParent: Task = {
+            id: 'virtual-orphan-parent',
+            title: 'Orphans',
+            startDate: minDate,
+            endDate: maxDate,
+            startDateProperty: '',
+            endDateProperty: '',
+            row: 0,
+            group: 'Orphans'
+        };
+
+        // Add virtual parent
+        sortedTasks.push(virtualOrphanParent);
+
+        // Add orphans as children (visually) - we just list them after
+        trueOrphans.forEach(task => sortedTasks.push(task));
+    }
+
+    // 7. Re-assign rows
     return sortedTasks.map((task, index) => ({
         ...task,
         row: index
     }));
 }
-
-/**
- * Parse a date value from various formats.
- * Handles Date objects, ISO strings, and timestamps.
- *
- * @param value - Value to parse
- * @returns Date object or null
- */
 
 /**
  * Parse a date value from various formats.

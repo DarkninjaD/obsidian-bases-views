@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { App, BasesQueryResult } from 'obsidian';
 import { adaptBasesData } from '../../../utils/basesDataAdapter';
 import { entriesToTasks, calculateTaskRows, groupTasksByProperty, calculateGroupedRows } from '../utils/ganttHelpers';
@@ -41,6 +41,15 @@ export function useGanttData(
     new Set(initialCollapsedGroups || [])
   );
 
+  // Sync state with props when they change (e.g. from Settings)
+  useEffect(() => { setStartDateProperty(initialStartProperty || 'start'); }, [initialStartProperty]);
+  useEffect(() => { setEndDateProperty(initialEndProperty || 'end'); }, [initialEndProperty]);
+  useEffect(() => { setGroupByProperty(initialGroupByProperty || ''); }, [initialGroupByProperty]);
+  useEffect(() => { setHierarchyProperty(initialHierarchyProperty || 'Parent'); }, [initialHierarchyProperty]);
+  // Collapsed groups might be user-managed, so maybe don't strictly sync if user collapses locally?
+  // But if config changes, we probably should.
+  useEffect(() => { setCollapsedGroups(new Set(initialCollapsedGroups || [])); }, [initialCollapsedGroups]);
+
   // Transform Bases data to our internal format
   const entries = useMemo(() => {
     return adaptBasesData(data, app);
@@ -60,6 +69,11 @@ export function useGanttData(
   const { tasks, groups } = useMemo(() => {
     if (!groupByProperty || groupByProperty.trim() === '') {
       // No grouping - calculate rows for all tasks
+      // IF hierarchy is active, tasks are already sorted and have rows assigned by sortTasksByHierarchy
+      if (hierarchyProperty) {
+         return { tasks: rawTasks, groups: [] as TaskGroup[] };
+      }
+
       const tasksWithRows = calculateTaskRows(rawTasks);
       return { tasks: tasksWithRows, groups: [] as TaskGroup[] };
     }
@@ -100,6 +114,7 @@ export function useGanttData(
     setStartDateProperty,
     setEndDateProperty,
     setGroupByProperty,
+    setHierarchyProperty, // Export this
     collapsedGroups,
     toggleGroupCollapse,
   };

@@ -51,7 +51,7 @@ export interface CalendarViewOptions {
  */
 export interface Task {
   id: string;
-  file: TFile;
+  file?: TFile; // Optional for virtual tasks (e.g., Orphan group)
   title: string;
   startDate: Date;
   endDate: Date;
