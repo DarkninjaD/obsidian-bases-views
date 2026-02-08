@@ -14,6 +14,7 @@ interface UseTaskDragOptions {
   chartRef: React.RefObject<HTMLDivElement>;
   onDragEnd?: () => void;
   timelineStep?: GanttTimelineStep;
+  onTaskDateChange?: (task: Task, newStartDate: Date, newEndDate: Date) => Promise<void>;
 }
 
 /**
@@ -55,6 +56,7 @@ export function useTaskDrag({
   chartRef,
   onDragEnd,
   timelineStep,
+  onTaskDateChange,
 }: UseTaskDragOptions) {
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -123,10 +125,13 @@ export function useTaskDrag({
         const newStartDate = calculateDateFromDelta(originalStartDate, deltaX, pixelsPerUnit, step);
         const newEndDate = calculateDateFromDelta(originalEndDate, deltaX, pixelsPerUnit, step);
 
-        // Update both date properties
-        void updateProperty(task.file, task.startDateProperty, newStartDate.toISOString());
-        void updateProperty(task.file, task.endDateProperty, newEndDate.toISOString());
-
+        // Update dates: use callback if provided (for cascading), else direct update
+        if (onTaskDateChange) {
+            void onTaskDateChange(task, newStartDate, newEndDate);
+        } else {
+            void updateProperty(task.file, task.startDateProperty, newStartDate.toISOString());
+            void updateProperty(task.file, task.endDateProperty, newEndDate.toISOString());
+        }
       };
 
       /**
@@ -157,7 +162,7 @@ export function useTaskDrag({
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     },
-    [task, updateProperty, getPixelsPerUnit, step, groups, groupByProperty, chartRef, onDragEnd]
+    [task, updateProperty, getPixelsPerUnit, step, groups, groupByProperty, chartRef, onDragEnd, onTaskDateChange]
   );
 
   return {

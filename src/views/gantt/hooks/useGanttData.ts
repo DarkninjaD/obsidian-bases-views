@@ -22,6 +22,7 @@ export function useGanttData(
   initialStartProperty: string,
   initialEndProperty: string,
   initialGroupByProperty?: string,
+  initialHierarchyProperty?: string,
   initialCollapsedGroups?: string[]
 ) {
   const [startDateProperty, setStartDateProperty] = useState(
@@ -32,6 +33,9 @@ export function useGanttData(
   );
   const [groupByProperty, setGroupByProperty] = useState(
     initialGroupByProperty || ''
+  );
+  const [hierarchyProperty, setHierarchyProperty] = useState(
+    initialHierarchyProperty || 'Parent'
   );
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
     new Set(initialCollapsedGroups || [])
@@ -44,8 +48,8 @@ export function useGanttData(
 
   // Convert entries to tasks with date filtering and group info
   const rawTasks = useMemo(() => {
-    return entriesToTasks(entries, startDateProperty, endDateProperty, groupByProperty);
-  }, [entries, startDateProperty, endDateProperty, groupByProperty]);
+    return entriesToTasks(entries, startDateProperty, endDateProperty, groupByProperty, hierarchyProperty);
+  }, [entries, startDateProperty, endDateProperty, groupByProperty, hierarchyProperty]);
 
   // Calculate timeline range based on all tasks
   const [timelineStart, timelineEnd] = useMemo(() => {

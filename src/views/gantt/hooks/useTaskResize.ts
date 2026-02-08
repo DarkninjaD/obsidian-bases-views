@@ -12,6 +12,7 @@ interface UseTaskResizeOptions {
   chartRef: React.RefObject<HTMLDivElement>;
   onResizeEnd?: () => void;
   timelineStep?: GanttTimelineStep;
+  onTaskDateChange?: (task: Task, newStartDate: Date, newEndDate: Date) => Promise<void>;
 }
 
 /**
@@ -29,6 +30,7 @@ export function useTaskResize({
   chartRef,
   onResizeEnd,
   timelineStep,
+  onTaskDateChange,
 }: UseTaskResizeOptions) {
   const [isResizing, setIsResizing] = useState(false);
   const resizeTypeRef = useRef<'start' | 'end' | null>(null);
@@ -100,7 +102,14 @@ export function useTaskResize({
             return; // Don't allow end date to be before start date
           }
 
-          void updateProperty(task.file, propertyName, newDate.toISOString());
+          if (onTaskDateChange) {
+            // Reconstruct the full date range for the callback
+            const sDate = handle === 'start' ? newDate : task.startDate;
+            const eDate = handle === 'end' ? newDate : task.endDate;
+            void onTaskDateChange(task, sDate, eDate);
+          } else {
+            void updateProperty(task.file, propertyName, newDate.toISOString());
+          }
         }
       };
 
