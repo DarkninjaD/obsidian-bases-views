@@ -10,6 +10,7 @@ import { GanttGroupHeader } from './components/GanttGroupHeader';
 import { TextInputModal } from '../../components/shared/TextInputModal';
 import { GanttViewOptions } from '../../types/view-config';
 import { usePropertyUpdate } from '../../hooks/usePropertyUpdate';
+import { NoTask } from './components/NoTask';
 
 interface GanttViewProps {
   data: BasesQueryResult;
@@ -183,13 +184,15 @@ export const GanttView: React.FC<GanttViewProps> = ({
         const tStart = isRoot ? newStartDate : new Date(currentTask.startDate.getTime() + delta);
         const tEnd = isRoot ? newEndDate : new Date(currentTask.endDate.getTime() + delta);
 
-        updates.set(currentTask.id, {
-            file: currentTask.file,
-            start: tStart,
-            end: tEnd,
-            startProp: currentTask.startDateProperty,
-            endProp: currentTask.endDateProperty
-        });
+        if (currentTask.file) {
+            updates.set(currentTask.id, {
+                file: currentTask.file,
+                start: tStart,
+                end: tEnd,
+                startProp: currentTask.startDateProperty,
+                endProp: currentTask.endDateProperty
+            });
+        }
 
         // 3. Find children and recurse (ONLY if it's a move, i.e. start and end moved by same amount)
         // If it's a resize (duration change), usually children don't move?
@@ -221,7 +224,6 @@ export const GanttView: React.FC<GanttViewProps> = ({
 
   return (
     <div className="bv-gantt-view">
-
       {/* Gantt chart container */}
       <div className="bv-gantt-container">
         {/* Left sidebar with task list */}
@@ -277,16 +279,10 @@ export const GanttView: React.FC<GanttViewProps> = ({
 
             {/* Empty state message when no tasks */}
             {tasks.length === 0 && groups.length === 0 && (
-              <div className="bv-gantt-empty-overlay">
-                <div className="bv-gantt-empty-message">
-                  <p>No tasks with valid dates found</p>
-                  <p className="bv-gantt-empty-hint">
-                    Click on the chart to create your first task, or add{' '}
-                    <code>{startDateProperty}</code> and <code>{endDateProperty}</code>{' '}
-                    properties to existing notes.
-                  </p>
-                </div>
-              </div>
+              <NoTask
+                startDateProperty={startDateProperty}
+                endDateProperty={endDateProperty}
+              />
             )}
           </div>
         </div>
