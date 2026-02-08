@@ -32,6 +32,7 @@ export interface GanttViewOptions {
   startDateProperty: string;
   endDateProperty: string;
   groupByProperty?: string;
+  hierarchyProperty?: string; // Property used for parent/child hierarchy
   collapsedGroups?: string[]; // Persisted collapsed group names
   timelineStep?: GanttTimelineStep; // Timeline granularity (default: 'day')
 }
@@ -58,6 +59,7 @@ export interface Task {
   endDateProperty: string;
   row: number;
   group?: string;
+  parentId?: string;
 }
 
 /**

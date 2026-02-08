@@ -4,18 +4,48 @@ import { parseISO, isValid } from 'date-fns';
 /**
  * Safely convert any value to a string.
  * Objects are JSON-stringified, primitives use String().
+ * HANDLES LINKS: If value is a link object or WikiLink, extracts display text.
  */
-function valueToString(value: unknown): string {
-  if (typeof value === 'object' && value !== null) {
+export function valueToString(value: unknown): string {
+  if (value === null || value === undefined) return '';
+
+  // Handle WikiLinks [[Link]]
+  if (typeof value === 'string' && value.startsWith('[[') && value.endsWith(']]')) {
+    const content = value.slice(2, -2); // Remove [[ ]]
+    // Handle aliases [[Path|Alias]]
+    const parts = content.split('|');
+    return parts.length > 1 ? parts[1] : parts[0];
+  }
+
+  if (typeof value === 'object') {
+    // Handle Frontmatter Links / TFile references often found in Bases
+    // Common properties: path, file, link, displayText, or simply a file object
+    const v = value as any;
+    if (v.displayText) return v.displayText;
+    if (v.path) {
+        // Extract basename from path (e.g., "Folder/Note.md" -> "Note")
+        const parts = v.path.split('/');
+        const filename = parts[parts.length - 1];
+        return filename.replace(/\.md$/, '');
+    }
+    if (v.file && v.file.basename) return v.file.basename;
+
     return JSON.stringify(value);
   }
+
   if (typeof value === 'string') {
     return value;
   }
-  if (typeof value === 'number' || typeof value === 'boolean') {
-    return String(value);
-  }
+
   return String(value);
+}
+
+/**
+ * Extract text from a link/object property for hierarchy ID matching.
+ * Similar to valueToString but focused on getting the ID/Path for parent lookup.
+ */
+export function extractLinkText(value: unknown): string {
+    return valueToString(value);
 }
 
 /**
@@ -28,11 +58,24 @@ function valueToString(value: unknown): string {
  * @param groupByProperty - Optional property name for grouping
  * @returns Array of tasks
  */
+
+/**
+ * Transform entries into tasks for Gantt view.
+ * Filters entries that have valid start and end dates.
+ *
+ * @param entries - Array of entries
+ * @param startDateProperty - Property name for start date
+ * @param endDateProperty - Property name for end date
+ * @param groupByProperty - Optional property name for grouping
+ * @param hierarchyProperty - Optional property name for parent/child hierarchy
+ * @returns Array of tasks
+ */
 export function entriesToTasks(
   entries: BasesEntry[],
   startDateProperty: string,
   endDateProperty: string,
-  groupByProperty?: string
+  groupByProperty?: string,
+  hierarchyProperty?: string
 ): Task[] {
   const tasks: Task[] = [];
 
@@ -52,23 +95,126 @@ export function entriesToTasks(
           : 'No Group')
       : undefined;
 
+    // Get parent ID if hierarchy is enabled
+    let parentId: string | undefined = undefined;
+    if (hierarchyProperty) {
+        const rawParent = entry.properties[hierarchyProperty];
+        if (rawParent) {
+            parentId = extractLinkText(rawParent);
+        }
+    }
+
     // Only include entries with valid dates
     if (startDate && endDate) {
       tasks.push({
-        id: entry.id,
+        id: entry.id, // Full path
         file: entry.file,
         title: entry.file.basename,
         startDate,
         endDate,
         startDateProperty,
         endDateProperty,
-        row: index,
+        row: index, // Temporary row
         group: groupValue,
+        parentId
       });
     }
   });
 
+  // If hierarchy property is set, sort tasks by hierarchy
+  if (hierarchyProperty) {
+      return sortTasksByHierarchy(tasks);
+  }
+
   return tasks;
+}
+
+/**
+ * Sort tasks to respect hierarchy (Parent -> Children).
+ * Handles orphans (missing parents) and cycles A->B->A.
+ */
+export function sortTasksByHierarchy(tasks: Task[]): Task[] {
+    const taskMap = new Map<string, Task>();
+    const childrenMap = new Map<string, Task[]>();
+
+    // 1. Build maps
+    tasks.forEach(task => {
+        // Map by Basename for easier linking (flexible matching)
+        // OR by full Path (ID). Bases usually stores links as [[Name]] which matches Basename.
+        // Let's store both if possible, but for lookup we need to match what extractLinkText returns.
+        // extractLinkText returns basename usually.
+        taskMap.set(task.title, task); // Primary key: Title/Basename
+        taskMap.set(task.id, task);    // Secondary key: File Path
+    });
+
+    tasks.forEach(task => {
+        if (task.parentId) {
+            // Find parent
+            const parent = taskMap.get(task.parentId);
+            if (parent) {
+                // Determine the "canonical" ID for the parent to group children
+                // We use the parent's Title as the key in childrenMap
+                // because that's what we likely searched for.
+                const parentKey = parent.title;
+                if (!childrenMap.has(parentKey)) {
+                    childrenMap.set(parentKey, []);
+                }
+                childrenMap.get(parentKey)!.push(task);
+            } else {
+                // Parent not found -> Treat as Orphan (Root)
+                task.parentId = undefined;
+            }
+        }
+    });
+
+    const sortedTasks: Task[] = [];
+    const visited = new Set<string>();
+    const processing = new Set<string>(); // Cycle detection
+
+    function visit(task: Task) {
+        if (visited.has(task.title)) return;
+        if (processing.has(task.title)) {
+            console.warn(`Cycle detected for task: ${task.title}`);
+            return;
+        }
+
+        processing.add(task.title);
+
+        // Add self
+        sortedTasks.push(task);
+        visited.add(task.title);
+
+        // Visit children
+        const children = childrenMap.get(task.title);
+        if (children) {
+            // Sort children by date (optional, but good for Gantt)
+            children.sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+            children.forEach(child => visit(child));
+        }
+
+        processing.delete(task.title);
+    }
+
+    // 2. Start DFS from Roots (tasks with no parent)
+    tasks.forEach(task => {
+        if (!task.parentId) {
+            visit(task);
+        }
+    });
+
+    // 3. Handle any remaining tasks (e.g. part of a detached cycle or tricky orphans)
+    tasks.forEach(task => {
+        if (!visited.has(task.title)) {
+            // It was part of a cycle or lookup failed weirdly. Add it to bottom.
+            visit(task);
+        }
+    });
+
+    // 4. Re-assign rows based on new order
+    return sortedTasks.map((task, index) => ({
+        ...task,
+        row: index
+    }));
 }
 
 /**
@@ -78,7 +224,15 @@ export function entriesToTasks(
  * @param value - Value to parse
  * @returns Date object or null
  */
-function parseDate(value: unknown): Date | null {
+
+/**
+ * Parse a date value from various formats.
+ * Handles Date objects, ISO strings, timestamps, and common text formats.
+ *
+ * @param value - Value to parse
+ * @returns Date object or null
+ */
+export function parseDate(value: unknown): Date | null {
   if (!value) return null;
 
   // Already a Date object
@@ -86,15 +240,26 @@ function parseDate(value: unknown): Date | null {
     return isValid(value) ? value : null;
   }
 
-  // String (ISO format)
+  // String
   if (typeof value === 'string') {
-    const parsed = parseISO(value);
-    return isValid(parsed) ? parsed : null;
+    // Try ISO format first
+    let parsed = parseISO(value);
+    if (isValid(parsed)) return parsed;
+
+    // Try YYYY-MM-DD manually if Date.parse/parseISO fails slightly differently
+    // Or other formats like DD.MM.YYYY
+    if (value.match(/^\d{2}\.\d{2}\.\d{4}$/)) {
+        const [d, m, y] = value.split('.');
+        parsed = new Date(`${y}-${m}-${d}`);
+        if (isValid(parsed)) return parsed;
+    }
   }
 
   // Number (timestamp)
   if (typeof value === 'number') {
     const parsed = new Date(value);
+    // Filter out obviously wrong timestamps (e.g. very small numbers that aren't dates)
+    // But Bases might use Unix seconds vs ms? Usually ms in JS.
     return isValid(parsed) ? parsed : null;
   }
 
