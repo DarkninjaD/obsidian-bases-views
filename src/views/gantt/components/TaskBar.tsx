@@ -18,6 +18,7 @@ interface TaskBarProps {
   chartRef: React.RefObject<HTMLDivElement>;
   onInteractionEnd?: () => void;
   timelineStep?: GanttTimelineStep;
+  onTaskDateChange?: (task: Task, newStartDate: Date, newEndDate: Date) => Promise<void>;
 }
 
 /**
@@ -36,6 +37,7 @@ export const TaskBar: React.FC<TaskBarProps> = ({
   chartRef,
   onInteractionEnd,
   timelineStep,
+  onTaskDateChange,
 }) => {
   // Inline editing state
   const [isEditing, setIsEditing] = React.useState(false);
@@ -56,6 +58,7 @@ export const TaskBar: React.FC<TaskBarProps> = ({
     chartRef,
     onResizeEnd: onInteractionEnd,
     timelineStep,
+    onTaskDateChange,
   });
   const { isDragging, handleDragStart, consumeHadMovement: consumeDragMovement } = useTaskDrag({
     task,
@@ -67,6 +70,7 @@ export const TaskBar: React.FC<TaskBarProps> = ({
     chartRef,
     onDragEnd: onInteractionEnd,
     timelineStep,
+    onTaskDateChange,
   });
 
   const { handleMouseEnter, handleMouseLeave } = useHoverPreview(

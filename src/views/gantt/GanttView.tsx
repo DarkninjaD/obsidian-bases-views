@@ -47,6 +47,7 @@ export const GanttView: React.FC<GanttViewProps> = ({
     options.startDateProperty,
     options.endDateProperty,
     options.groupByProperty,
+    options.hierarchyProperty,
     options.collapsedGroups
   );
 
@@ -153,6 +154,71 @@ export const GanttView: React.FC<GanttViewProps> = ({
     : 0;
   const chartHeight = Math.max((maxRow + 1) * 40, 200); // Min height for empty state
 
+  /**
+   * Handle task date changes (from drag/resize).
+   * Implements cascading updates: if a task moves, all its children move by the same delta.
+   */
+  const handleTaskDateChange = React.useCallback(async (task: any, newStartDate: Date, newEndDate: Date) => {
+    // 1. Calculate delta from original start date
+    const diffTime = newStartDate.getTime() - task.startDate.getTime();
+
+    // If no change, standard update (or skip) - but here we proceed to check children
+    if (diffTime === 0 && newEndDate.getTime() === task.endDate.getTime()) {
+      return;
+    }
+
+    // 2. recursive helper to collect all updates
+    const updates = new Map<string, {file: any, start: Date, end: Date, startProp: string, endProp: string}>();
+
+    // Helper to find children
+    const getChildren = (parentId: string) => {
+        // Use tasks array (which is flat). This is O(N) per node, naive but efficient enough for typical Bases
+        // Optimization: build a map if performance becomes an issue
+        return tasks.filter(t => t.parentId === parentId || (t.parentId && t.parentId === task.title && parentId === task.id));
+        // Note: task.title vs task.id matching depends on how we stored parentId.
+        // In ganttHelpers we prefer Title for parentId matching.
+    };
+
+    const processTask = (currentTask: any, delta: number, isRoot: boolean) => {
+        const tStart = isRoot ? newStartDate : new Date(currentTask.startDate.getTime() + delta);
+        const tEnd = isRoot ? newEndDate : new Date(currentTask.endDate.getTime() + delta);
+
+        updates.set(currentTask.id, {
+            file: currentTask.file,
+            start: tStart,
+            end: tEnd,
+            startProp: currentTask.startDateProperty,
+            endProp: currentTask.endDateProperty
+        });
+
+        // 3. Find children and recurse (ONLY if it's a move, i.e. start and end moved by same amount)
+        // If it's a resize (duration change), usually children don't move?
+        // Requirement: "If the parent timeline moves the children timeline should move too."
+        // We assume "Moves" = Shift. If we just extend the end, children probably shouldn't move?
+        // Let's assume strict shift for now.
+        const isShift = (tEnd.getTime() - tStart.getTime()) === (currentTask.endDate.getTime() - currentTask.startDate.getTime());
+
+        if (isShift) {
+             // Find children by title (as parentId usually matches title/basename)
+             const children = tasks.filter(t => t.parentId === currentTask.title);
+             children.forEach(child => {
+                 if (!updates.has(child.id)) {
+                     processTask(child, delta, false);
+                 }
+             });
+        }
+    };
+
+    processTask(task, diffTime, true);
+
+    // 4. Apply all updates
+    for (const update of updates.values()) {
+        await updateProperty(update.file, update.startProp, update.start.toISOString());
+        await updateProperty(update.file, update.endProp, update.end.toISOString());
+    }
+
+  }, [tasks, updateProperty]);
+
   return (
     <div className="bv-gantt-view">
 
@@ -205,6 +271,7 @@ export const GanttView: React.FC<GanttViewProps> = ({
                 chartRef={chartRef}
                 onInteractionEnd={handleInteractionEnd}
                 timelineStep={options.timelineStep}
+                onTaskDateChange={handleTaskDateChange}
               />
             ))}
 
